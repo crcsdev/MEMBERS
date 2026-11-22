@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2563eb">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>Membros</title>
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--tx:#111827;--sub:#6b7280;--pri:#2563eb;--bd:#e5e7eb;--dng:#dc2626}
+@media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--tx:#f9fafb;--sub:#9ca3af;--bd:#374151}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+header{padding:calc(12px + env(safe-area-inset-top)) 16px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
+h1{margin:0;font-size:20px}
+main{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;border:0;background:none;color:var(--sub);padding:14px 0;font-size:13px}
+nav button.on{color:var(--pri);font-weight:600}
+button,select,input{font:inherit;color:var(--tx)}
+button{padding:10px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+button.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+button.danger{color:var(--dng)}
+input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+.card,.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
+.box{flex-direction:column;align-items:stretch}
+.col{display:flex;flex-direction:column;gap:10px}
+.row{display:flex;gap:8px;align-items:center}
+.sp{flex:1}
+.sub,.hint,.empty{color:var(--sub);font-size:13px}
+.av{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
+.ph{background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.tag{display:inline-block;background:var(--bg);border-radius:8px;padding:2px 8px;font-size:12px;margin:2px 4px 0 0}
+.card.on{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 12%,var(--card))}
+.chk{font-size:22px;color:var(--pri)}
+.big{font-size:32px;font-weight:700;text-align:center}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stats .box{align-items:center;text-align:center}
+.stats b{font-size:22px}
+.bar{position:relative;background:var(--bg);border-radius:8px;height:26px;overflow:hidden}
+.bar span{position:absolute;inset:0 auto 0 0;background:var(--pri);opacity:.35}
+.bar em{position:relative;font-style:normal;font-size:13px;line-height:26px;padding-left:8px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--bd)}
+.scroll{overflow-x:auto}
+dialog{width:min(92vw,420px);border:0;border-radius:16px;background:var(--bg);color:var(--tx);padding:16px}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog form{display:flex;flex-direction:column;gap:10px}
+</style>
+</head>
+<body>
+<header><h1 id="title"></h1></header>
+<main id="view"></main>
+<nav id="tabs"></nav>
+<dialog id="dlg"></dialog>
+
+<script>
+/* ========== Storage (IndexedDB key-value) ========== */
+const DB = (() => {
+  const open = () => new Promise((res, rej) => {
+    const r = indexedDB.open('membros', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('kv');
+    r.onsuccess = () => res(r.result);
+    r.onerror = () => rej(r.error);
+  });
+  const tx = async (mode, fn) => {
+    const db = await open();
+    return new Promise((res, rej) => {
+      const t = db.transaction('kv', mode);
+      const req = fn(t.objectStore('kv'));
+      t.oncomplete = () => res(req.result);
+      t.onerror = () => rej(t.error);
+    });
+  };
+  return { get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k)) };
+})();
+
+/* ========== State ========== */
+// traits: [{id, name, values:[{id, name}]}] -> array order = rank (index 0 is the highest)
+// people: [{id, name, phone, birth, photo, traits:{traitId: valueId}}]
+// sessions: [{id, date, name, present:[personId]}]
+let state = { people: [], traits: [], sessions: [] };
+const ui = { tab: 'people', q: '', sessionId: null, an: { traitId: '', valueId: '', from: '', to: '' } };
+let photoTmp = '';
+
+const save = () => DB.set('state', state);
+const commit = () => { save(); render(); };
+
+/* ========== Utils ========== */
+const $ = s => document.querySelector(s);
+const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+const fmtDate = iso => (iso ? iso.split('-').reverse().join('/') : '');
+const move = (arr, i, d) => { const j = i + d; if (j >= 0 && j < arr.length) [arr[i], arr[j]] = [arr[j], arr[i]]; };
+const curSession = () => state.sessions.find(s => s.id === ui.sessionId);
+
+const age = birth => {
+  if (!birth) return '';
+  const b = new Date(birth + 'T00:00'), n = new Date();
+  let a = n.getFullYear() - b.getFullYear();
+  if (n < new Date(n.getFullYear(), b.getMonth(), b.getDate())) a--;
+  return a;
+};
+
+// Resize and center-crop the photo to a 256px square JPEG data URL
+const readPhoto = file => new Promise((res, rej) => {
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 256;
+    const m = Math.min(img.width, img.height);
+    c.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, 256, 256);
+    URL.revokeObjectURL(img.src);
+    res(c.toDataURL('image/jpeg', 0.75));
+  };
+  img.onerror = rej;
+  img.src = URL.createObjectURL(file);
+});
+
+/* ========== Ranking ========== */
+const valueIndex = (p, t) => {
+  const i = t.values.findIndex(v => v.id === p.traits[t.id]);
+  return i < 0 ? 999 : i;
+};
+// Sort by trait priority first, then by value rank, then by name
+const sortPeople = list => [...list].sort((a, b) => {
+  for (const t of state.traits) {
+    const d = valueIndex(a, t) - valueIndex(b, t);
+    if (d) return d;
+  }
+  return a.name.localeCompare(b.name);
+});
+
+/* ========== Shared UI pieces ========== */
+const avatar = p => p.photo
+  ? `<img class="av" src="${p.photo}" alt="">`
+  : `<div class="av ph">${esc((p.name[0] || '?').toUpperCase())}</div>`;
+
+const badges = p => state.traits.map(t => {
+  const v = t.values.find(v => v.id === p.traits[t.id]);
+  return v ? `<span class="tag">${esc(t.name)}: ${esc(v.name)}</span>` : '';
+}).join('');
+
+const matchQ = p => !ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase());
+const openDlg = html => { $('#dlg').innerHTML = html; $('#dlg').showModal(); };
+
+/* ========== View: People ========== */
+const peopleList = () => sortPeople(state.people).filter(matchQ).map(p => `
+  <div class="card" data-act="editPerson" data-id="${p.id}">
+    ${avatar(p)}
+    <div>
+      <b>${esc(p.name)}</b>
+      <div class="sub">${esc(p.phone)}${p.birth ? ` · ${fmtDate(p.birth)} (${age(p.birth)} anos)` : ''}</div>
+      <div>${badges(p)}</div>
+    </div>
+  </div>`).join('') || '<p class="empty">Nenhuma pessoa.</p>';
+
+const peopleView = () => `
+  <button class="primary" data-act="newPerson">+ Nova pessoa</button>
+  <input id="q" placeholder="Buscar nome ou telefone…" value="${esc(ui.q)}">
+  <div id="list" class="col">${peopleList()}</div>`;
+
+const personDialog = id => {
+  const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {} };
+  photoTmp = p.photo;
+  openDlg(`
+  <form id="personForm" data-id="${p.id}">
+    <div class="row">
+      <img id="pv" class="av" src="${p.photo}" ${p.photo ? '' : 'hidden'} alt="">
+      <input type="file" id="photoIn" accept="image/*">
+    </div>
+    <label>Nome<input name="name" required value="${esc(p.name)}"></label>
+    <label>Telefone<input name="phone" type="tel" value="${esc(p.phone)}"></label>
+    <label>Data de nascimento<input name="birth" type="date" value="${esc(p.birth)}"></label>
+    ${state.traits.map(t => `
+      <label>${esc(t.name)}
+        <select name="t_${t.id}">
+          <option value="">—</option>
+          ${t.values.map(v => `<option value="${v.id}" ${p.traits[t.id] === v.id ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}
+        </select>
+      </label>`).join('')}
+    <div class="row">
+      <button type="button" data-act="closeDlg">Cancelar</button>
+      ${p.id ? `<button type="button" class="danger" data-act="delPerson" data-id="${p.id}">Excluir</button>` : ''}
+      <span class="sp"></span>
+      <button class="primary">Salvar</button>
+    </div>
+  </form>`);
+};
+
+const savePerson = (f, id) => {
+  const data = { name: f.get('name').trim(), phone: f.get('phone').trim(), birth: f.get('birth'), photo: photoTmp, traits: {} };
+  state.traits.forEach(t => { const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v; });
+  if (id) Object.assign(state.people.find(p => p.id === id), data);
+  else state.people.push({ id: uid(), ...data });
+  $('#dlg').close();
+  commit();
+};
+
+/* ========== View: Traits ========== */
+const traitsView = () => `
+  <button class="primary" data-act="addTrait">+ Atributo</button>
+  <p class="hint">A ordem define a superioridade: o topo é o mais alto. Pessoas são ordenadas pelos atributos na ordem listada.</p>
+  ${state.traits.map((t, ti) => `
+  <section class="box">
+    <div class="row">
+      <b>${esc(t.name)}</b><span class="sp"></span>
+      <button data-act="moveTrait" data-i="${ti}" data-d="-1">↑</button>
+      <button data-act="moveTrait" data-i="${ti}" data-d="1">↓</button>
+      <button data-act="renTrait" data-i="${ti}">✎</button>
+      <button class="danger" data-act="delTrait" data-i="${ti}">🗑</button>
+    </div>
+    ${t.values.map((v, vi) => `
+    <div class="row">
+      <span>${vi + 1}. ${esc(v.name)}</span><span class="sp"></span>
+      <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="-1">↑</button>
+      <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="1">↓</button>
+      <button data-act="renVal" data-i="${ti}" data-j="${vi}">✎</button>
+      <button class="danger" data-act="delVal" data-i="${ti}" data-j="${vi}">🗑</button>
+    </div>`).join('')}
+    <button data-act="addValue" data-i="${ti}">+ Valor</button>
+  </section>`).join('')}`;
+
+/* ========== View: Attendance ========== */
+const rollList = () => {
+  const s = curSession();
+  return sortPeople(state.people).filter(matchQ).map(p => {
+    const on = s.present.includes(p.id);
+    return `<div class="card ${on ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
+      ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p)}</div></div>
+      <span class="sp"></span><span class="chk">${on ? '✔' : ''}</span></div>`;
+  }).join('') || '<p class="empty">Nenhuma pessoa.</p>';
+};
+
+const rollCall = () => {
+  const s = curSession();
+  return `
+  <div class="row">
+    <button data-act="backSessions">←</button>
+    <b>${esc(s.name || 'Chamada')} · ${fmtDate(s.date)}</b><span class="sp"></span>
+    <button class="danger" data-act="delSession">🗑</button>
+  </div>
+  <div class="big" id="cnt">${s.present.length} / ${state.people.length}</div>
+  <input id="q" placeholder="Buscar…" value="${esc(ui.q)}">
+  <div id="list" class="col">${rollList()}</div>`;
+};
+
+const attView = () => ui.sessionId ? rollCall() : `
+  <button class="primary" data-act="newSession">+ Nova chamada</button>
+  ${[...state.sessions].sort((a, b) => b.date.localeCompare(a.date)).map(s => `
+  <div class="card" data-act="openSession" data-id="${s.id}">
+    <div><b>${esc(s.name || 'Chamada')}</b><div class="sub">${fmtDate(s.date)}</div></div>
+    <span class="sp"></span><b>${s.present.length} presentes</b>
+  </div>`).join('') || '<p class="empty">Nenhuma chamada.</p>'}`;
+
+const sessionDialog = () => openDlg(`
+  <form id="sessionForm">
+    <label>Data<input name="date" type="date" required value="${today()}"></label>
+    <label>Nome (opcional)<input name="name" placeholder="Ex.: Culto de domingo"></label>
+    <div class="row">
+      <button type="button" data-act="closeDlg">Cancelar</button><span class="sp"></span>
+      <button class="primary">Criar</button>
+    </div>
+  </form>`);
+
+const saveSession = f => {
+  const s = { id: uid(), date: f.get('date'), name: f.get('name').trim(), present: [] };
+  state.sessions.push(s);
+  ui.sessionId = s.id;
+  ui.q = '';
+  $('#dlg').close();
+  commit();
+};
+
+/* ========== View: Stats ========== */
+const statsView = () => {
+  const a = ui.an;
+  const t = state.traits.find(x => x.id === a.traitId);
+  const sessions = state.sessions
+    .filter(s => (!a.from || s.date >= a.from) && (!a.to || s.date <= a.to))
+    .sort((x, y) => x.date.localeCompare(y.date));
+  const people = t && a.valueId ? state.people.filter(p => p.traits[t.id] === a.valueId) : state.people;
+  const n = sessions.length;
+
+  const perSession = sessions.map(s => ({ s, c: people.filter(p => s.present.includes(p.id)).length }));
+  const avg = n ? perSession.reduce((sum, x) => sum + x.c, 0) / n : 0;
+  const rate = people.length ? Math.round(avg / people.length * 100) : 0;
+
+  const rows = people.map(p => {
+    const hits = sessions.filter(s => s.present.includes(p.id));
+    return { p, c: hits.length, pct: n ? hits.length / n * 100 : 0, last: hits.length ? hits[hits.length - 1].date : '' };
+  }).sort((x, y) => y.pct - x.pct || x.p.name.localeCompare(y.p.name));
+
+  const last3 = sessions.slice(-3);
+  const absent = n >= 3 ? people.filter(p => last3.every(s => !s.present.includes(p.id))) : [];
+
+  const opt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
+  return `
+  <section class="box">
+    <div class="row">
+      <select data-f="traitId">${opt('', 'Todos', a.traitId)}${state.traits.map(x => opt(x.id, x.name, a.traitId)).join('')}</select>
+      ${t ? `<select data-f="valueId">${opt('', 'Todos', a.valueId)}${t.values.map(v => opt(v.id, v.name, a.valueId)).join('')}</select>` : ''}
+    </div>
+    <div class="row">
+      <input type="date" data-f="from" value="${a.from}"><input type="date" data-f="to" value="${a.to}">
+    </div>
+  </section>
+  <div class="stats">
+    <div class="box"><b>${n}</b><span class="sub">chamadas</span></div>
+    <div class="box"><b>${avg.toFixed(1)}</b><span class="sub">média presentes</span></div>
+    <div class="box"><b>${rate}%</b><span class="sub">taxa média</span></div>
+  </div>
+  <section class="box">
+    <b>Por chamada</b>
+    ${perSession.map(x => `<div class="bar"><span style="width:${people.length ? x.c / people.length * 100 : 0}%"></span><em>${fmtDate(x.s.date)} · ${esc(x.s.name)} · ${x.c}</em></div>`).join('') || '<p class="empty">Sem dados.</p>'}
+  </section>
+  <section class="box">
+    <b>Ranking de presença</b>
+    <div class="scroll"><table>
+      <tr><th>Nome</th><th>Pres.</th><th>%</th><th>Última</th></tr>
+      ${rows.map(r => `<tr><td>${esc(r.p.name)}</td><td>${r.c}/${n}</td><td>${Math.round(r.pct)}%</td><td>${fmtDate(r.last) || '—'}</td></tr>`).join('')}
+    </table></div>
+  </section>
+  ${n >= 3 ? `<section class="box"><b>Ausentes nas últimas 3 chamadas</b>${absent.map(p => `<div>${esc(p.name)}</div>`).join('') || '<p class="empty">Ninguém.</p>'}</section>` : ''}`;
+};
+
+/* ========== View: Backup ========== */
+const backupView = () => `
+  <section class="box">
+    <p class="hint">${state.people.length} pessoas · ${state.traits.length} atributos · ${state.sessions.length} chamadas</p>
+    <button class="primary" data-act="export">Exportar backup (.json)</button>
+    <label>Importar backup (substitui os dados atuais)<input type="file" id="importIn" accept="application/json,.json"></label>
+  </section>`;
+
+const exportData = () => {
+  const blob = new Blob([JSON.stringify({ app: 'membros', version: 1, exportedAt: new Date().toISOString(), ...state })], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `membros-${today()}.json`;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+};
+
+const importData = async file => {
+  try {
+    const d = JSON.parse(await file.text());
+    if (!Array.isArray(d.people) || !Array.isArray(d.traits) || !Array.isArray(d.sessions)) throw new Error('invalid');
+    if (!confirm(`Substituir os dados atuais por ${d.people.length} pessoas e ${d.sessions.length} chamadas?`)) return;
+    state = {
+      people: d.people.map(p => ({ ...p, traits: p.traits || {} })),
+      traits: d.traits.map(t => ({ ...t, values: t.values || [] })),
+      sessions: d.sessions.map(s => ({ ...s, present: s.present || [] }))
+    };
+    ui.sessionId = null;
+    commit();
+    alert('Backup importado.');
+  } catch { alert('Arquivo inválido.'); }
+};
+
+/* ========== Actions (click delegation) ========== */
+const ask = (msg, def = '') => (prompt(msg, def) || '').trim();
+const dropTraitFromPeople = (tid, vid) => state.people.forEach(p => {
+  if (!vid || p.traits[tid] === vid) delete p.traits[tid];
+});
+
+const act = {
+  tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.sessionId = null; render(); },
+  closeDlg: () => $('#dlg').close(),
+
+  newPerson: () => personDialog(''),
+  editPerson: el => personDialog(el.dataset.id),
+  delPerson: el => {
+    if (!confirm('Excluir esta pessoa?')) return;
+    const id = el.dataset.id;
+    state.people = state.people.filter(p => p.id !== id);
+    state.sessions.forEach(s => { s.present = s.present.filter(x => x !== id); });
+    $('#dlg').close();
+    commit();
+  },
+
+  addTrait: () => { const n = ask('Nome do atributo (ex.: Cargo):'); if (n) { state.traits.push({ id: uid(), name: n, values: [] }); commit(); } },
+  renTrait: el => { const t = state.traits[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) { t.name = n; commit(); } },
+  moveTrait: el => { move(state.traits, +el.dataset.i, +el.dataset.d); commit(); },
+  delTrait: el => {
+    const t = state.traits[el.dataset.i];
+    if (!confirm(`Excluir "${t.name}" e seus valores?`)) return;
+    dropTraitFromPeople(t.id);
+    state.traits.splice(el.dataset.i, 1);
+    commit();
+  },
+
+  addValue: el => { const n = ask('Nome do valor (ex.: Pastor):'); if (n) { state.traits[el.dataset.i].values.push({ id: uid(), name: n }); commit(); } },
+  renVal: el => { const v = state.traits[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) { v.name = n; commit(); } },
+  moveVal: el => { move(state.traits[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit(); },
+  delVal: el => {
+    const t = state.traits[el.dataset.i], v = t.values[el.dataset.j];
+    if (!confirm(`Excluir "${v.name}"?`)) return;
+    dropTraitFromPeople(t.id, v.id);
+    t.values.splice(el.dataset.j, 1);
+    commit();
+  },
+
+  newSession: sessionDialog,
+  openSession: el => { ui.sessionId = el.dataset.id; ui.q = ''; render(); },
+  backSessions: () => { ui.sessionId = null; ui.q = ''; render(); },
+  delSession: () => {
+    if (!confirm('Excluir esta chamada?')) return;
+    state.sessions = state.sessions.filter(s => s.id !== ui.sessionId);
+    ui.sessionId = null;
+    commit();
+  },
+  toggle: el => {
+    const s = curSession(), i = s.present.indexOf(el.dataset.id);
+    if (i < 0) s.present.push(el.dataset.id); else s.present.splice(i, 1);
+    save();
+    $('#cnt').textContent = `${s.present.length} / ${state.people.length}`;
+    refreshList();
+  },
+
+  export: exportData
+};
+
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (el) act[el.dataset.act]?.(el);
+});
+
+document.addEventListener('submit', e => {
+  e.preventDefault();
+  const f = new FormData(e.target);
+  ({ personForm: savePerson, sessionForm: saveSession })[e.target.id]?.(f, e.target.dataset.id);
+});
+
+document.addEventListener('input', e => {
+  if (e.target.id === 'q') { ui.q = e.target.value; refreshList(); }
+});
+
+document.addEventListener('change', async e => {
+  const t = e.target;
+  if (t.id === 'photoIn' && t.files[0]) {
+    photoTmp = await readPhoto(t.files[0]);
+    $('#pv').src = photoTmp;
+    $('#pv').hidden = false;
+  } else if (t.dataset.f) {
+    ui.an[t.dataset.f] = t.value;
+    if (t.dataset.f === 'traitId') ui.an.valueId = '';
+    render();
+  } else if (t.id === 'importIn' && t.files[0]) {
+    await importData(t.files[0]);
+    t.value = '';
+  }
+});
+
+/* ========== Render ========== */
+const TABS = [['people', 'Pessoas', peopleView], ['traits', 'Atributos', traitsView], ['att', 'Presença', attView], ['stats', 'Análise', statsView], ['backup', 'Backup', backupView]];
+const refreshList = () => { $('#list').innerHTML = ui.tab === 'people' ? peopleList() : rollList(); };
+
+function render() {
+  $('#tabs').innerHTML = TABS.map(([k, l]) => `<button data-act="tab" data-k="${k}" class="${ui.tab === k ? 'on' : ''}">${l}</button>`).join('');
+  const [, label, view] = TABS.find(t => t[0] === ui.tab);
+  $('#title').textContent = label;
+  $('#view').innerHTML = view();
+}
+
+/* ========== Init ========== */
+(async () => {
+  state = (await DB.get('state')) || state;
+  render();
+  navigator.storage?.persist?.();
+  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+})();
+</script>
+</body>
+</html>

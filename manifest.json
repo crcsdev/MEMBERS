@@ -1,6 +1,6 @@
 {
-  "name": "Membros",
-  "short_name": "Membros",
+  "name": "MEMBERS",
+  "short_name": "MEMBERS",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

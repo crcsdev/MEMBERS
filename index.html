@@ -6,11 +6,13 @@
 <meta name="theme-color" content="#2563eb">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
-<title>Membros</title>
+<link rel="apple-touch-icon" href="apple-icon.png">
+<title>MEMBERS</title>
 <style>
 :root{--bg:#f3f4f6;--card:#fff;--tx:#111827;--sub:#6b7280;--pri:#2563eb;--bd:#e5e7eb;--dng:#dc2626}
 @media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--tx:#f9fafb;--sub:#9ca3af;--bd:#374151}}
 *{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
 header{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
 h1{margin:0;font-size:20px}
@@ -23,17 +25,22 @@ button,select,input{font:inherit;color:var(--tx)}
 button{padding:10px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
 button.primary{background:var(--pri);border-color:var(--pri);color:#fff}
 button.danger{color:var(--dng)}
-input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+/* 16px minimum on fields: smaller sizes make Safari zoom in on focus */
+input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--card);font-size:16px}
+input[type=checkbox]{width:auto}
 label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+label.chkrow{flex-direction:row;align-items:center;gap:8px;font-size:16px;color:var(--tx)}
 .card,.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
 .box{flex-direction:column;align-items:stretch}
 .col{display:flex;flex-direction:column;gap:10px}
 .row{display:flex;gap:8px;align-items:center}
 .sp{flex:1}
 .sub,.hint,.empty{color:var(--sub);font-size:13px}
+.grp{margin-top:6px}
 .av{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
 .ph{background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
 .tag{display:inline-block;background:var(--bg);border-radius:8px;padding:2px 8px;font-size:12px;margin:2px 4px 0 0}
+.tag.dp{background:color-mix(in srgb,var(--pri) 18%,var(--bg))}
 .card.on{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 12%,var(--card))}
 .chk{font-size:22px;color:var(--pri)}
 .big{font-size:32px;font-weight:700;text-align:center}
@@ -61,6 +68,7 @@ dialog form{display:flex;flex-direction:column;gap:10px}
 
 <script>
 /* ========== Storage (IndexedDB key-value) ========== */
+// DB name stays 'membros' so data saved by earlier versions keeps loading
 const DB = (() => {
   const open = () => new Promise((res, rej) => {
     const r = indexedDB.open('membros', 1);
@@ -81,12 +89,14 @@ const DB = (() => {
 })();
 
 /* ========== State ========== */
-// institutions: [{id, name, traits:[{id, name, values:[{id, name}]}]}] -> array order = rank (index 0 is the highest)
-// people:       [{id, instId, name, phone, birth, photo, traits:{traitId: valueId}}]
-// events:       [{id, instId, name, repeat, start}]   repeat: none | daily | weekly | biweekly | monthly
-// sessions:     [{id, eventId, date, present:[personId]}]   one session = one roll call on one date
+// institutions: [{id, name, traits:[{id, name, values:[{id, name}]}], depts:[{id, name}]}]
+//               -> array order = rank for traits and values (index 0 is the highest)
+// people:       [{id, instId, name, phone, birth, photo, traits:{traitId: valueId}, depts:[deptId]}]
+// events:       [{id, instId, deptId, name, repeat, start}]   deptId '' = whole institution
+//               repeat: none | daily | weekly | biweekly | monthly
+// sessions:     [{id, eventId, date, present:[personId]}]     one session = one roll call on one date
 let state = { institutions: [], people: [], events: [], sessions: [] };
-const ui = { instId: null, tab: 'people', q: '', eventId: null, sessionId: null, an: { eventId: '', traitId: '', valueId: '', from: '', to: '' } };
+const ui = { instId: null, tab: 'people', q: '', dq: '', eventId: null, sessionId: null, an: {} };
 let photoTmp = '';
 
 const REPEAT = { none: 'Não repete', daily: 'Todo dia', weekly: 'Toda semana', biweekly: 'A cada 2 semanas', monthly: 'Todo mês' };
@@ -148,6 +158,11 @@ const instEvents = () => state.events.filter(e => e.instId === ui.instId);
 const curEvent = () => state.events.find(e => e.id === ui.eventId);
 const curSession = () => state.sessions.find(s => s.id === ui.sessionId);
 const eventSessions = id => state.sessions.filter(s => s.eventId === id);
+const deptName = id => inst().depts.find(d => d.id === id)?.name || '';
+
+// Who is expected at an event: everybody, or only the members of its department
+const inEvent = (p, ev) => !ev.deptId || p.depts.includes(ev.deptId);
+const eventPeople = ev => instPeople().filter(p => inEvent(p, ev));
 
 /* ========== Events: recurrence ========== */
 // Every date of the event from its start until today
@@ -200,13 +215,16 @@ const badges = p => inst().traits.map(t => {
   return v ? `<span class="tag">${esc(t.name)}: ${esc(v.name)}</span>` : '';
 }).join('');
 
-const matchQ = p => !ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase());
+const deptTags = p => p.depts.map(deptName).filter(Boolean).map(n => `<span class="tag dp">${esc(n)}</span>`).join('');
+
+const matchQ = p => (!ui.dq || p.depts.includes(ui.dq)) && (!ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase()));
 const openDlg = html => { $('#dlg').innerHTML = html; $('#dlg').showModal(); };
 const dlgButtons = (extra = '') => `
   <div class="row">
     <button type="button" data-act="closeDlg">Cancelar</button>${extra}
     <span class="sp"></span><button class="primary">Salvar</button>
   </div>`;
+const selectOpt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
 
 /* ========== View: Institutions (home) ========== */
 const homeView = () => `
@@ -215,7 +233,7 @@ const homeView = () => `
   <div class="card" data-act="openInst" data-id="${i.id}">
     <div>
       <b>${esc(i.name)}</b>
-      <div class="sub">${state.people.filter(p => p.instId === i.id).length} pessoas · ${state.events.filter(e => e.instId === i.id).length} eventos</div>
+      <div class="sub">${state.people.filter(p => p.instId === i.id).length} pessoas · ${i.depts.length} departamentos · ${state.events.filter(e => e.instId === i.id).length} eventos</div>
     </div>
     <span class="sp"></span>
     <button data-act="renInst" data-id="${i.id}">✎</button>
@@ -230,17 +248,18 @@ const peopleList = () => sortPeople(instPeople()).filter(matchQ).map(p => `
     <div>
       <b>${esc(p.name)}</b>
       <div class="sub">${esc(p.phone)}${p.birth ? ` · ${fmtDate(p.birth)} (${age(p.birth)} anos)` : ''}</div>
-      <div>${badges(p)}</div>
+      <div>${badges(p)}${deptTags(p)}</div>
     </div>
   </div>`).join('') || '<p class="empty">Nenhuma pessoa.</p>';
 
 const peopleView = () => `
   <button class="primary" data-act="newPerson">+ Nova pessoa</button>
   <input id="q" placeholder="Buscar nome ou telefone…" value="${esc(ui.q)}">
+  ${inst().depts.length ? `<select id="deptF">${selectOpt('', 'Todos os departamentos', ui.dq)}${inst().depts.map(d => selectOpt(d.id, d.name, ui.dq)).join('')}</select>` : ''}
   <div id="list" class="col">${peopleList()}</div>`;
 
 const personDialog = id => {
-  const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {} };
+  const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: [] };
   photoTmp = p.photo;
   openDlg(`
   <form id="personForm" data-id="${p.id}">
@@ -258,12 +277,21 @@ const personDialog = id => {
           ${t.values.map(v => `<option value="${v.id}" ${p.traits[t.id] === v.id ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}
         </select>
       </label>`).join('')}
+    ${inst().depts.length ? `
+      <div class="col">
+        <span class="hint">Departamentos</span>
+        ${inst().depts.map(d => `<label class="chkrow"><input type="checkbox" name="d_${d.id}" ${p.depts.includes(d.id) ? 'checked' : ''}>${esc(d.name)}</label>`).join('')}
+      </div>` : ''}
     ${dlgButtons(p.id ? `<button type="button" class="danger" data-act="delPerson" data-id="${p.id}">Excluir</button>` : '')}
   </form>`);
 };
 
 const savePerson = (f, id) => {
-  const data = { name: f.get('name').trim(), phone: f.get('phone').trim(), birth: f.get('birth'), photo: photoTmp, traits: {} };
+  const data = {
+    name: f.get('name').trim(), phone: f.get('phone').trim(), birth: f.get('birth'), photo: photoTmp,
+    traits: {},
+    depts: inst().depts.filter(d => f.get('d_' + d.id)).map(d => d.id)
+  };
   inst().traits.forEach(t => { const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v; });
   if (id) Object.assign(state.people.find(p => p.id === id), data);
   else state.people.push({ id: uid(), instId: ui.instId, ...data });
@@ -295,18 +323,39 @@ const traitsView = () => `
     <button data-act="addValue" data-i="${ti}">+ Valor</button>
   </section>`).join('')}`;
 
+/* ========== View: Departments ========== */
+const deptsView = () => `
+  <button class="primary" data-act="addDept">+ Departamento</button>
+  <p class="hint">Toque em um departamento para ver seus membros. Atribua pessoas a ele no cadastro delas.</p>
+  ${inst().depts.map(d => `
+  <div class="card" data-act="deptPeople" data-id="${d.id}">
+    <div>
+      <b>${esc(d.name)}</b>
+      <div class="sub">${instPeople().filter(p => p.depts.includes(d.id)).length} membros · ${instEvents().filter(e => e.deptId === d.id).length} eventos</div>
+    </div>
+    <span class="sp"></span>
+    <button data-act="renDept" data-id="${d.id}">✎</button>
+    <button class="danger" data-act="delDept" data-id="${d.id}">🗑</button>
+  </div>`).join('') || '<p class="empty">Nenhum departamento.</p>'}`;
+
 /* ========== View: Events ========== */
 const lastDate = ev => eventSessions(ev.id).map(s => s.date).sort().pop() || '';
 
-const eventsView = () => `
-  <button class="primary" data-act="newEvent">+ Novo evento</button>
-  ${instEvents().map(ev => `
+const eventsView = () => {
+  const groups = [{ id: '', name: 'Toda a instituição' }, ...inst().depts];
+  const card = ev => `
   <div class="card" data-act="openEvent" data-id="${ev.id}">
     <div>
       <b>${esc(ev.name)}</b>
       <div class="sub">${REPEAT[ev.repeat]} · ${eventSessions(ev.id).length} chamadas${lastDate(ev) ? ` · última ${fmtDate(lastDate(ev))}` : ''}</div>
     </div>
-  </div>`).join('') || '<p class="empty">Nenhum evento. Crie um (ex.: Culto de domingo).</p>'}`;
+  </div>`;
+  const body = groups.map(g => {
+    const list = instEvents().filter(e => e.deptId === g.id);
+    return list.length ? `<b class="grp">${esc(g.name)}</b>${list.map(card).join('')}` : '';
+  }).join('');
+  return `<button class="primary" data-act="newEvent">+ Novo evento</button>${body || '<p class="empty">Nenhum evento. Crie um (ex.: Culto de domingo).</p>'}`;
+};
 
 const eventView = () => {
   const ev = curEvent();
@@ -317,7 +366,7 @@ const eventView = () => {
     <b>${esc(ev.name)}</b><span class="sp"></span>
     <button data-act="editEvent" data-id="${ev.id}">✎</button>
   </div>
-  <p class="hint">${REPEAT[ev.repeat]} · desde ${fmtDate(ev.start)}</p>
+  <p class="hint">${ev.deptId ? `${esc(deptName(ev.deptId))} · ` : ''}${REPEAT[ev.repeat]} · desde ${fmtDate(ev.start)}</p>
   <section class="box">
     <b>${ev.repeat === 'none' ? 'Data do evento' : 'Datas sem chamada'}</b>
     <div class="chips">
@@ -332,14 +381,18 @@ const eventView = () => {
 };
 
 const eventDialog = id => {
-  const ev = state.events.find(x => x.id === id) || { id: '', name: '', repeat: 'weekly', start: today() };
+  const ev = state.events.find(x => x.id === id) || { id: '', name: '', deptId: '', repeat: 'weekly', start: today() };
   openDlg(`
   <form id="eventForm" data-id="${ev.id}">
     <label>Nome<input name="name" required placeholder="Ex.: Culto de domingo" value="${esc(ev.name)}"></label>
-    <label>Repetição
-      <select name="repeat">
-        ${Object.entries(REPEAT).map(([k, l]) => `<option value="${k}" ${ev.repeat === k ? 'selected' : ''}>${l}</option>`).join('')}
+    <label>Pertence a
+      <select name="deptId">
+        ${selectOpt('', 'Toda a instituição', ev.deptId)}
+        ${inst().depts.map(d => selectOpt(d.id, d.name, ev.deptId)).join('')}
       </select>
+    </label>
+    <label>Repetição
+      <select name="repeat">${Object.entries(REPEAT).map(([k, l]) => selectOpt(k, l, ev.repeat)).join('')}</select>
     </label>
     <label>Primeira data<input name="start" type="date" required value="${ev.start}"></label>
     ${dlgButtons(ev.id ? `<button type="button" class="danger" data-act="delEvent" data-id="${ev.id}">Excluir</button>` : '')}
@@ -347,7 +400,7 @@ const eventDialog = id => {
 };
 
 const saveEvent = (f, id) => {
-  const data = { name: f.get('name').trim(), repeat: f.get('repeat'), start: f.get('start') };
+  const data = { name: f.get('name').trim(), deptId: f.get('deptId'), repeat: f.get('repeat'), start: f.get('start') };
   if (id) Object.assign(state.events.find(e => e.id === id), data);
   else {
     const ev = { id: uid(), instId: ui.instId, ...data };
@@ -367,7 +420,7 @@ const dateDialog = () => openDlg(`
 /* ========== View: Roll call ========== */
 const rollList = () => {
   const s = curSession();
-  return sortPeople(instPeople()).filter(matchQ).map(p => {
+  return sortPeople(eventPeople(curEvent())).filter(matchQ).map(p => {
     const on = s.present.includes(p.id);
     return `<div class="card ${on ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
       ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p)}</div></div>
@@ -376,14 +429,14 @@ const rollList = () => {
 };
 
 const rollCall = () => {
-  const s = curSession();
+  const s = curSession(), ev = curEvent();
   return `
   <div class="row">
     <button data-act="backEvent">←</button>
-    <b>${esc(curEvent().name)} · ${fmtDate(s.date)}</b><span class="sp"></span>
+    <b>${esc(ev.name)} · ${fmtDate(s.date)}</b><span class="sp"></span>
     <button class="danger" data-act="delSession">🗑</button>
   </div>
-  <div class="big" id="cnt">${s.present.length} / ${instPeople().length}</div>
+  <div class="big" id="cnt">${s.present.length} / ${eventPeople(ev).length}</div>
   <input id="q" placeholder="Buscar…" value="${esc(ui.q)}">
   <div id="list" class="col">${rollList()}</div>`;
 };
@@ -392,35 +445,47 @@ const attView = () => ui.sessionId ? rollCall() : ui.eventId ? eventView() : eve
 
 /* ========== View: Stats ========== */
 const statsView = () => {
-  const a = ui.an, traits = inst().traits;
+  const a = ui.an, traits = inst().traits, depts = inst().depts, evs = instEvents();
   const t = traits.find(x => x.id === a.traitId);
-  const evIds = new Set(instEvents().filter(e => !a.eventId || e.id === a.eventId).map(e => e.id));
+  const evOf = s => evs.find(e => e.id === s.eventId);
+  const evOptions = evs.filter(e => !a.deptId || e.deptId === a.deptId);
+
+  const evIds = new Set(evOptions.filter(e => !a.eventId || e.id === a.eventId).map(e => e.id));
   const sessions = state.sessions
     .filter(s => evIds.has(s.eventId) && (!a.from || s.date >= a.from) && (!a.to || s.date <= a.to))
     .sort((x, y) => x.date.localeCompare(y.date));
-  const people = t && a.valueId ? instPeople().filter(p => p.traits[t.id] === a.valueId) : instPeople();
+  const people = instPeople().filter(p =>
+    (!a.deptId || p.depts.includes(a.deptId)) && (!t || !a.valueId || p.traits[t.id] === a.valueId));
   const n = sessions.length;
 
-  const perSession = sessions.map(s => ({ s, c: people.filter(p => s.present.includes(p.id)).length }));
+  // Each session is measured against the people expected at its event
+  const perSession = sessions.map(s => {
+    const elig = people.filter(p => inEvent(p, evOf(s)));
+    return { s, c: elig.filter(p => s.present.includes(p.id)).length, tot: elig.length };
+  });
   const avg = n ? perSession.reduce((sum, x) => sum + x.c, 0) / n : 0;
-  const rate = people.length ? Math.round(avg / people.length * 100) : 0;
+  const rate = n ? Math.round(perSession.reduce((sum, x) => sum + (x.tot ? x.c / x.tot : 0), 0) / n * 100) : 0;
 
   const rows = people.map(p => {
-    const hits = sessions.filter(s => s.present.includes(p.id));
-    return { p, c: hits.length, pct: n ? hits.length / n * 100 : 0, last: hits.length ? hits[hits.length - 1].date : '' };
+    const el = sessions.filter(s => inEvent(p, evOf(s)));
+    const hits = el.filter(s => s.present.includes(p.id));
+    return { p, c: hits.length, tot: el.length, pct: el.length ? hits.length / el.length * 100 : 0, last: hits.length ? hits[hits.length - 1].date : '' };
   }).sort((x, y) => y.pct - x.pct || x.p.name.localeCompare(y.p.name));
 
   const last3 = sessions.slice(-3);
-  const absent = n >= 3 ? people.filter(p => last3.every(s => !s.present.includes(p.id))) : [];
+  const absent = n >= 3 ? people.filter(p => {
+    const el = last3.filter(s => inEvent(p, evOf(s)));
+    return el.length && el.every(s => !s.present.includes(p.id));
+  }) : [];
 
-  const evName = id => state.events.find(e => e.id === id)?.name || '';
-  const opt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
+  const evName = id => evs.find(e => e.id === id)?.name || '';
   return `
   <section class="box">
-    <select data-f="eventId">${opt('', 'Todos os eventos', a.eventId)}${instEvents().map(e => opt(e.id, e.name, a.eventId)).join('')}</select>
+    ${depts.length ? `<select data-f="deptId">${selectOpt('', 'Todos os departamentos', a.deptId)}${depts.map(d => selectOpt(d.id, d.name, a.deptId)).join('')}</select>` : ''}
+    <select data-f="eventId">${selectOpt('', 'Todos os eventos', a.eventId)}${evOptions.map(e => selectOpt(e.id, e.name, a.eventId)).join('')}</select>
     <div class="row">
-      <select data-f="traitId">${opt('', 'Todos', a.traitId)}${traits.map(x => opt(x.id, x.name, a.traitId)).join('')}</select>
-      ${t ? `<select data-f="valueId">${opt('', 'Todos', a.valueId)}${t.values.map(v => opt(v.id, v.name, a.valueId)).join('')}</select>` : ''}
+      <select data-f="traitId">${selectOpt('', 'Todos', a.traitId)}${traits.map(x => selectOpt(x.id, x.name, a.traitId)).join('')}</select>
+      ${t ? `<select data-f="valueId">${selectOpt('', 'Todos', a.valueId)}${t.values.map(v => selectOpt(v.id, v.name, a.valueId)).join('')}</select>` : ''}
     </div>
     <div class="row">
       <input type="date" data-f="from" value="${a.from}"><input type="date" data-f="to" value="${a.to}">
@@ -433,13 +498,13 @@ const statsView = () => {
   </div>
   <section class="box">
     <b>Por chamada</b>
-    ${perSession.map(x => `<div class="bar"><span style="width:${people.length ? x.c / people.length * 100 : 0}%"></span><em>${fmtDate(x.s.date)}${a.eventId ? '' : ` · ${esc(evName(x.s.eventId))}`} · ${x.c}</em></div>`).join('') || '<p class="empty">Sem dados.</p>'}
+    ${perSession.map(x => `<div class="bar"><span style="width:${x.tot ? x.c / x.tot * 100 : 0}%"></span><em>${fmtDate(x.s.date)}${a.eventId ? '' : ` · ${esc(evName(x.s.eventId))}`} · ${x.c}</em></div>`).join('') || '<p class="empty">Sem dados.</p>'}
   </section>
   <section class="box">
     <b>Ranking de presença</b>
     <div class="scroll"><table>
       <tr><th>Nome</th><th>Pres.</th><th>%</th><th>Última</th></tr>
-      ${rows.map(r => `<tr><td>${esc(r.p.name)}</td><td>${r.c}/${n}</td><td>${Math.round(r.pct)}%</td><td>${fmtDate(r.last) || '—'}</td></tr>`).join('')}
+      ${rows.map(r => `<tr><td>${esc(r.p.name)}</td><td>${r.c}/${r.tot}</td><td>${Math.round(r.pct)}%</td><td>${fmtDate(r.last) || '—'}</td></tr>`).join('')}
     </table></div>
   </section>
   ${n >= 3 ? `<section class="box"><b>Ausentes nas últimas 3 chamadas</b>${absent.map(p => `<div>${esc(p.name)}</div>`).join('') || '<p class="empty">Ninguém.</p>'}</section>` : ''}`;
@@ -454,27 +519,29 @@ const backupView = () => `
     <label>Importar backup (substitui os dados atuais)<input type="file" id="importIn" accept="application/json,.json"></label>
   </section>`;
 
-// Converts any saved/backup format into the current one (v1 had no institutions or events)
+// Converts any saved/backup format into the current one
+// v1: no institutions or events | v2: no departments | v3: current
 const migrate = d => {
-  const people = (d.people || []).map(p => ({ ...p, traits: p.traits || {} }));
+  const people = (d.people || []).map(p => ({ ...p, traits: p.traits || {}, depts: p.depts || [] }));
   const sessions = (d.sessions || []).map(s => ({ ...s, present: s.present || [] }));
+  const fixTraits = list => (list || []).map(t => ({ ...t, values: t.values || [] }));
 
   if (Array.isArray(d.institutions)) {
     return {
-      institutions: d.institutions.map(i => ({ ...i, traits: (i.traits || []).map(t => ({ ...t, values: t.values || [] })) })),
+      institutions: d.institutions.map(i => ({ ...i, traits: fixTraits(i.traits), depts: i.depts || [] })),
       people,
-      events: d.events || [],
+      events: (d.events || []).map(e => ({ ...e, deptId: e.deptId || '' })),
       sessions
     };
   }
 
   // v1: everything goes into one institution; each distinct roll call name becomes an event
-  const institution = { id: uid(), name: 'Minha instituição', traits: (d.traits || []).map(t => ({ ...t, values: t.values || [] })) };
+  const institution = { id: uid(), name: 'Minha instituição', traits: fixTraits(d.traits), depts: [] };
   const events = [];
   sessions.forEach(s => {
     const name = s.name || 'Chamada';
     let ev = events.find(e => e.name === name);
-    if (!ev) { ev = { id: uid(), instId: institution.id, name, repeat: 'none', start: s.date }; events.push(ev); }
+    if (!ev) { ev = { id: uid(), instId: institution.id, deptId: '', name, repeat: 'none', start: s.date }; events.push(ev); }
     if (s.date < ev.start) ev.start = s.date;
     s.eventId = ev.id;
     delete s.name;
@@ -483,10 +550,10 @@ const migrate = d => {
 };
 
 const exportData = () => {
-  const blob = new Blob([JSON.stringify({ app: 'membros', version: 2, exportedAt: new Date().toISOString(), ...state })], { type: 'application/json' });
+  const blob = new Blob([JSON.stringify({ app: 'members', version: 3, exportedAt: new Date().toISOString(), ...state })], { type: 'application/json' });
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = `membros-${today()}.json`;
+  a.download = `members-${today()}.json`;
   a.click();
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 };
@@ -505,8 +572,8 @@ const importData = async file => {
 
 /* ========== Actions (click delegation) ========== */
 const resetNav = instId => {
-  Object.assign(ui, { instId, tab: 'people', q: '', eventId: null, sessionId: null });
-  ui.an = { eventId: '', traitId: '', valueId: '', from: '', to: '' };
+  Object.assign(ui, { instId, tab: 'people', q: '', dq: '', eventId: null, sessionId: null });
+  ui.an = { deptId: '', eventId: '', traitId: '', valueId: '', from: '', to: '' };
 };
 const dropTraitFromPeople = (tid, vid) => state.people.forEach(p => {
   if (!vid || p.traits[tid] === vid) delete p.traits[tid];
@@ -517,11 +584,11 @@ const removeEvent = id => {
 };
 
 const act = {
-  tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.eventId = null; ui.sessionId = null; render(); },
+  tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.eventId = null; ui.sessionId = null; render(); },
   closeDlg: () => $('#dlg').close(),
 
   home: () => { resetNav(null); render(); },
-  addInst: () => { const n = ask('Nome da instituição:'); if (n) { state.institutions.push({ id: uid(), name: n, traits: [] }); commit(); } },
+  addInst: () => { const n = ask('Nome da instituição:'); if (n) { state.institutions.push({ id: uid(), name: n, traits: [], depts: [] }); commit(); } },
   openInst: el => { resetNav(el.dataset.id); render(); },
   renInst: el => {
     const i = state.institutions.find(x => x.id === el.dataset.id);
@@ -570,6 +637,22 @@ const act = {
     commit();
   },
 
+  addDept: () => { const n = ask('Nome do departamento (ex.: Varões):'); if (n) { inst().depts.push({ id: uid(), name: n }); commit(); } },
+  renDept: el => {
+    const d = inst().depts.find(x => x.id === el.dataset.id);
+    const n = ask('Novo nome:', d.name);
+    if (n) { d.name = n; commit(); }
+  },
+  delDept: el => {
+    const id = el.dataset.id, d = inst().depts.find(x => x.id === id);
+    if (!confirm(`Excluir "${d.name}" com seus eventos e chamadas? As pessoas continuam na instituição.`)) return;
+    state.events.filter(e => e.deptId === id).forEach(e => removeEvent(e.id));
+    state.people.forEach(p => { p.depts = p.depts.filter(x => x !== id); });
+    inst().depts = inst().depts.filter(x => x.id !== id);
+    commit();
+  },
+  deptPeople: el => { ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; render(); },
+
   newEvent: () => eventDialog(''),
   editEvent: el => eventDialog(el.dataset.id),
   openEvent: el => { ui.eventId = el.dataset.id; render(); },
@@ -596,7 +679,7 @@ const act = {
     const s = curSession(), i = s.present.indexOf(el.dataset.id);
     if (i < 0) s.present.push(el.dataset.id); else s.present.splice(i, 1);
     save();
-    $('#cnt').textContent = `${s.present.length} / ${instPeople().length}`;
+    $('#cnt').textContent = `${s.present.length} / ${eventPeople(curEvent()).length}`;
     refreshList();
   },
 
@@ -628,9 +711,13 @@ document.addEventListener('change', async e => {
     photoTmp = await readPhoto(t.files[0]);
     $('#pv').src = photoTmp;
     $('#pv').hidden = false;
+  } else if (t.id === 'deptF') {
+    ui.dq = t.value;
+    refreshList();
   } else if (t.dataset.f) {
     ui.an[t.dataset.f] = t.value;
     if (t.dataset.f === 'traitId') ui.an.valueId = '';
+    if (t.dataset.f === 'deptId') ui.an.eventId = '';
     render();
   } else if (t.id === 'importIn' && t.files[0]) {
     await importData(t.files[0]);
@@ -639,13 +726,15 @@ document.addEventListener('change', async e => {
 });
 
 /* ========== Render ========== */
-const TABS = [['people', 'Pessoas', peopleView], ['traits', 'Atributos', traitsView], ['att', 'Eventos', attView], ['stats', 'Análise', statsView]];
+const TABS = [
+  ['people', 'Pessoas', peopleView], ['traits', 'Atributos', traitsView], ['depts', 'Deptos', deptsView],
+  ['att', 'Eventos', attView], ['stats', 'Análise', statsView]
+];
 const refreshList = () => { $('#list').innerHTML = ui.tab === 'people' ? peopleList() : rollList(); };
 
 function render() {
-  const i = inst();
-  if (ui.instId && !i) resetNav(null);
-  const [, label, view] = ui.instId ? TABS.find(t => t[0] === ui.tab) : [0, 'Instituições', homeView];
+  if (ui.instId && !inst()) resetNav(null);
+  const [, label, view] = ui.instId ? TABS.find(t => t[0] === ui.tab) : [0, 'MEMBERS', homeView];
 
   $('#head').innerHTML = `${ui.instId ? '<button data-act="home">←</button>' : ''}<h1>${esc(ui.instId ? `${inst().name} · ${label}` : label)}</h1>`;
   $('#tabs').hidden = !ui.instId;
@@ -655,11 +744,12 @@ function render() {
 
 /* ========== Init ========== */
 (async () => {
+  resetNav(null);
   const saved = await DB.get('state');
   if (saved) {
-    const legacy = !saved.institutions;
+    const outdated = !saved.institutions || saved.institutions.some(i => !i.depts);
     state = migrate(saved);
-    if (legacy) save();
+    if (outdated) save();
   }
   render();
   navigator.storage?.persist?.();

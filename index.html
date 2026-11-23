@@ -1,233 +1,543 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#2563eb">
-<link rel="manifest" href="manifest.json">
-<link rel="icon" href="icon-192.png">
-<link rel="apple-touch-icon" href="apple-icon.png">
-<title>MEMBERS</title>
-<style>
-:root{--bg:#f3f4f6;--card:#fff;--tx:#111827;--sub:#6b7280;--pri:#2563eb;--bd:#e5e7eb;--dng:#dc2626}
-@media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--tx:#f9fafb;--sub:#9ca3af;--bd:#374151}}
-*{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
-header{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
-h1{margin:0;font-size:20px}
-main{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
-nav[hidden]{display:none}
-nav button{flex:1;border:0;background:none;color:var(--sub);padding:14px 0;font-size:13px}
-nav button.on{color:var(--pri);font-weight:600}
-button,select,input{font:inherit;color:var(--tx)}
-button{padding:10px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
-button.primary{background:var(--pri);border-color:var(--pri);color:#fff}
-button.danger{color:var(--dng)}
-/* 16px minimum on fields: smaller sizes make Safari zoom in on focus */
-input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--card);font-size:16px}
-input[type=checkbox]{width:auto}
-label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
-label.chkrow{flex-direction:row;align-items:center;gap:8px;font-size:16px;color:var(--tx)}
-.card,.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
-.box{flex-direction:column;align-items:stretch}
-.col{display:flex;flex-direction:column;gap:10px}
-.row{display:flex;gap:8px;align-items:center}
-.sp{flex:1}
-.sub,.hint,.empty{color:var(--sub);font-size:13px}
-.grp{margin-top:6px}
-.av{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
-.ph{background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
-.tag{display:inline-block;background:var(--bg);border-radius:8px;padding:2px 8px;font-size:12px;margin:2px 4px 0 0}
-.tag.dp{background:color-mix(in srgb,var(--pri) 18%,var(--bg))}
-.card.on{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 12%,var(--card))}
-.chk{font-size:22px;color:var(--pri)}
-.big{font-size:32px;font-weight:700;text-align:center}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chips button{padding:6px 10px;font-size:13px}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stats .box{align-items:center;text-align:center}
-.stats b{font-size:22px}
-.bar{position:relative;background:var(--bg);border-radius:8px;height:26px;overflow:hidden}
-.bar span{position:absolute;inset:0 auto 0 0;background:var(--pri);opacity:.35}
-.bar em{position:relative;font-style:normal;font-size:13px;line-height:26px;padding-left:8px}
-table{width:100%;border-collapse:collapse;font-size:14px}
-th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--bd)}
-.scroll{overflow-x:auto}
-dialog{width:min(92vw,420px);border:0;border-radius:16px;background:var(--bg);color:var(--tx);padding:16px}
-dialog::backdrop{background:rgba(0,0,0,.5)}
-dialog form{display:flex;flex-direction:column;gap:10px}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2563eb">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+  <link rel="apple-touch-icon" href="apple-icon.png">
+
+  <!-- Basic -->
+  <meta name="description" content="Gerencie seu grupo de pessoas.">
+  <meta name="keywords" content="Pessoas, Chamada, PWA">
+  <meta name="author" content="crcs.dev">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://crcsdev.github.io/MEMBERS/">
+
+  <!-- Mobile / PWA -->
+  <link rel="apple-touch-icon" href="/apple-icon.png">
+
+  <!-- Open Graph (WhatsApp, Facebook, Telegram) -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="MEMBERS">
+  <meta property="og:title" content="MEMBERS>
+  <meta property="og:description" content="Gerencie seu grupo de pessoas.">
+  <meta property="og:url" content="https://crcsdev.github.io/MEMBERS/">
+  <meta property="og:image" content="https://crcsdev.github.io/MEMBERS/og-image.png">
+  <meta property="og:locale" content="pt-BR">
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="MEMBERS">
+  <meta name="twitter:description" content="Gerencie seu grupo de pessoas.">
+  <meta name="twitter:image" content="https://crcsdev.github.io/MEMBERS/og-image.png">
+
+  <!-- Google rich result (optional) -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "MEMBERS",
+      "url": "https://crcsdev.github.io/MEMBERS/",
+      "description": "Gerencie seu grupo de pessoas",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "image": "https://crcsdev.github.io/MEMBERS/icon512.png",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+  </script>
+
+  <title>MEMBERS</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #fff;
+      --tx: #111827;
+      --sub: #6b7280;
+      --pri: #2563eb;
+      --bd: #e5e7eb;
+      --dng: #dc2626
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root {
+        --bg: #111827;
+        --card: #1f2937;
+        --tx: #f9fafb;
+        --sub: #9ca3af;
+        --bd: #374151
+      }
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--tx);
+      font: 16px system-ui, sans-serif;
+      padding-bottom: calc(64px + env(safe-area-inset-bottom))
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: calc(12px + env(safe-area-inset-top)) 16px 8px;
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 5
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 20px
+    }
+
+    main {
+      padding: 0 16px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      background: var(--card);
+      border-top: 1px solid var(--bd);
+      padding-bottom: env(safe-area-inset-bottom)
+    }
+
+    nav[hidden] {
+      display: none
+    }
+
+    nav button {
+      flex: 1;
+      border: 0;
+      background: none;
+      color: var(--sub);
+      padding: 14px 0;
+      font-size: 13px
+    }
+
+    nav button.on {
+      color: var(--pri);
+      font-weight: 600
+    }
+
+    button,
+    select,
+    input {
+      font: inherit;
+      color: var(--tx)
+    }
+
+    button {
+      padding: 10px 14px;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      background: var(--card)
+    }
+
+    button.primary {
+      background: var(--pri);
+      border-color: var(--pri);
+      color: #fff
+    }
+
+    button.danger {
+      color: var(--dng)
+    }
+
+    /* 16px minimum on fields: smaller sizes make Safari zoom in on focus */
+    input,
+    select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      background: var(--card);
+      font-size: 16px
+    }
+
+    input[type=checkbox] {
+      width: auto
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--sub)
+    }
+
+    label.chkrow {
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      color: var(--tx)
+    }
+
+    .card,
+    .box {
+      background: var(--card);
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      padding: 10px;
+      display: flex;
+      gap: 10px;
+      align-items: center
+    }
+
+    .box {
+      flex-direction: column;
+      align-items: stretch
+    }
+
+    .col {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    .sp {
+      flex: 1
+    }
+
+    .sub,
+    .hint,
+    .empty {
+      color: var(--sub);
+      font-size: 13px
+    }
+
+    .grp {
+      margin-top: 6px
+    }
+
+    .av {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex: none
+    }
+
+    .ph {
+      background: var(--pri);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 2px 8px;
+      font-size: 12px;
+      margin: 2px 4px 0 0
+    }
+
+    .tag.dp {
+      background: color-mix(in srgb, var(--pri) 18%, var(--bg))
+    }
+
+    .card.on {
+      border-color: var(--pri);
+      background: color-mix(in srgb, var(--pri) 12%, var(--card))
+    }
+
+    .chk {
+      font-size: 22px;
+      color: var(--pri)
+    }
+
+    .big {
+      font-size: 32px;
+      font-weight: 700;
+      text-align: center
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .chips button {
+      padding: 6px 10px;
+      font-size: 13px
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px
+    }
+
+    .stats .box {
+      align-items: center;
+      text-align: center
+    }
+
+    .stats b {
+      font-size: 22px
+    }
+
+    .bar {
+      position: relative;
+      background: var(--bg);
+      border-radius: 8px;
+      height: 26px;
+      overflow: hidden
+    }
+
+    .bar span {
+      position: absolute;
+      inset: 0 auto 0 0;
+      background: var(--pri);
+      opacity: .35
+    }
+
+    .bar em {
+      position: relative;
+      font-style: normal;
+      font-size: 13px;
+      line-height: 26px;
+      padding-left: 8px
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 6px 4px;
+      border-bottom: 1px solid var(--bd)
+    }
+
+    .scroll {
+      overflow-x: auto
+    }
+
+    dialog {
+      width: min(92vw, 420px);
+      border: 0;
+      border-radius: 16px;
+      background: var(--bg);
+      color: var(--tx);
+      padding: 16px
+    }
+
+    dialog::backdrop {
+      background: rgba(0, 0, 0, .5)
+    }
+
+    dialog form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+  </style>
 </head>
+
 <body>
-<header id="head"></header>
-<main id="view"></main>
-<nav id="tabs"></nav>
-<dialog id="dlg"></dialog>
+  <header id="head"></header>
+  <main id="view"></main>
+  <nav id="tabs"></nav>
+  <dialog id="dlg"></dialog>
 
-<script>
-/* ========== Storage (IndexedDB key-value) ========== */
-// DB name stays 'membros' so data saved by earlier versions keeps loading
-const DB = (() => {
-  const open = () => new Promise((res, rej) => {
-    const r = indexedDB.open('membros', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('kv');
-    r.onsuccess = () => res(r.result);
-    r.onerror = () => rej(r.error);
-  });
-  const tx = async (mode, fn) => {
-    const db = await open();
-    return new Promise((res, rej) => {
-      const t = db.transaction('kv', mode);
-      const req = fn(t.objectStore('kv'));
-      t.oncomplete = () => res(req.result);
-      t.onerror = () => rej(t.error);
+  <script>
+    /* ========== Storage (IndexedDB key-value) ========== */
+    // DB name stays 'membros' so data saved by earlier versions keeps loading
+    const DB = (() => {
+      const open = () => new Promise((res, rej) => {
+        const r = indexedDB.open('membros', 1);
+        r.onupgradeneeded = () => r.result.createObjectStore('kv');
+        r.onsuccess = () => res(r.result);
+        r.onerror = () => rej(r.error);
+      });
+      const tx = async (mode, fn) => {
+        const db = await open();
+        return new Promise((res, rej) => {
+          const t = db.transaction('kv', mode);
+          const req = fn(t.objectStore('kv'));
+          t.oncomplete = () => res(req.result);
+          t.onerror = () => rej(t.error);
+        });
+      };
+      return {get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k))};
+    })();
+
+    /* ========== State ========== */
+    // institutions: [{id, name, traits:[{id, name, values:[{id, name}]}], depts:[{id, name}]}]
+    //               -> array order = rank for traits and values (index 0 is the highest)
+    // people:       [{id, instId, name, phone, birth, photo, traits:{traitId: valueId}, depts:[deptId]}]
+    // events:       [{id, instId, deptId, name, repeat, start}]   deptId '' = whole institution
+    //               repeat: none | daily | weekly | biweekly | monthly
+    // sessions:     [{id, eventId, date, present:[personId]}]     one session = one roll call on one date
+    let state = {institutions: [], people: [], events: [], sessions: []};
+    const ui = {instId: null, tab: 'people', q: '', dq: '', eventId: null, sessionId: null, an: {}};
+    let photoTmp = '';
+
+    const REPEAT = {none: 'Não repete', daily: 'Todo dia', weekly: 'Toda semana', biweekly: 'A cada 2 semanas', monthly: 'Todo mês'};
+
+    const save = () => DB.set('state', state);
+    const commit = () => {save(); render();};
+
+    /* ========== Utils ========== */
+    const $ = s => document.querySelector(s);
+    const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+    const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
+    const fmtDate = iso => (iso ? iso.split('-').reverse().join('/') : '');
+    const move = (arr, i, d) => {const j = i + d; if (j >= 0 && j < arr.length) [arr[i], arr[j]] = [arr[j], arr[i]];};
+    const ask = (msg, def = '') => (prompt(msg, def) || '').trim();
+
+    const age = birth => {
+      if (!birth) return '';
+      const b = new Date(birth + 'T00:00'), n = new Date();
+      let a = n.getFullYear() - b.getFullYear();
+      if (n < new Date(n.getFullYear(), b.getMonth(), b.getDate())) a--;
+      return a;
+    };
+
+    // Date math on ISO strings (UTC, so DST never shifts a day)
+    const addDays = (iso, n) => {
+      const d = new Date(iso + 'T00:00:00Z');
+      d.setUTCDate(d.getUTCDate() + n);
+      return d.toISOString().slice(0, 10);
+    };
+    // Keeps the day of month, clamped to the last day (Jan 31 + 1 month = Feb 28)
+    const addMonths = (iso, n) => {
+      const [y, m, day] = iso.split('-').map(Number);
+      const first = new Date(Date.UTC(y, m - 1 + n, 1));
+      const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
+      first.setUTCDate(Math.min(day, last));
+      return first.toISOString().slice(0, 10);
+    };
+
+    // Resize and center-crop the photo to a 256px square JPEG data URL
+    const readPhoto = file => new Promise((res, rej) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 256;
+        const m = Math.min(img.width, img.height);
+        c.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, 256, 256);
+        URL.revokeObjectURL(img.src);
+        res(c.toDataURL('image/jpeg', 0.75));
+      };
+      img.onerror = rej;
+      img.src = URL.createObjectURL(file);
     });
-  };
-  return { get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k)) };
-})();
 
-/* ========== State ========== */
-// institutions: [{id, name, traits:[{id, name, values:[{id, name}]}], depts:[{id, name}]}]
-//               -> array order = rank for traits and values (index 0 is the highest)
-// people:       [{id, instId, name, phone, birth, photo, traits:{traitId: valueId}, depts:[deptId]}]
-// events:       [{id, instId, deptId, name, repeat, start}]   deptId '' = whole institution
-//               repeat: none | daily | weekly | biweekly | monthly
-// sessions:     [{id, eventId, date, present:[personId]}]     one session = one roll call on one date
-let state = { institutions: [], people: [], events: [], sessions: [] };
-const ui = { instId: null, tab: 'people', q: '', dq: '', eventId: null, sessionId: null, an: {} };
-let photoTmp = '';
+    /* ========== Scoped selectors (current institution / event / session) ========== */
+    const inst = () => state.institutions.find(i => i.id === ui.instId);
+    const instPeople = () => state.people.filter(p => p.instId === ui.instId);
+    const instEvents = () => state.events.filter(e => e.instId === ui.instId);
+    const curEvent = () => state.events.find(e => e.id === ui.eventId);
+    const curSession = () => state.sessions.find(s => s.id === ui.sessionId);
+    const eventSessions = id => state.sessions.filter(s => s.eventId === id);
+    const deptName = id => inst().depts.find(d => d.id === id)?.name || '';
 
-const REPEAT = { none: 'Não repete', daily: 'Todo dia', weekly: 'Toda semana', biweekly: 'A cada 2 semanas', monthly: 'Todo mês' };
+    // Who is expected at an event: everybody, or only the members of its department
+    const inEvent = (p, ev) => !ev.deptId || p.depts.includes(ev.deptId);
+    const eventPeople = ev => instPeople().filter(p => inEvent(p, ev));
 
-const save = () => DB.set('state', state);
-const commit = () => { save(); render(); };
+    /* ========== Events: recurrence ========== */
+    // Every date of the event from its start until today
+    const occurrences = ev => {
+      if (ev.repeat === 'none') return [ev.start];
+      const step = {daily: 1, weekly: 7, biweekly: 14}[ev.repeat];
+      const out = [];
+      for (let i = 0; out.length < 1000; i++) {
+        const d = ev.repeat === 'monthly' ? addMonths(ev.start, i) : addDays(ev.start, i * step);
+        if (d > today()) break;
+        out.push(d);
+      }
+      return out;
+    };
+    // Occurrences that still have no roll call (most recent first, max 6)
+    const pendingDates = ev => {
+      const done = new Set(eventSessions(ev.id).map(s => s.date));
+      return occurrences(ev).filter(d => !done.has(d)).reverse().slice(0, 6);
+    };
+    // Opens the roll call of that date, creating it if needed
+    const createSession = (eventId, date) => {
+      let s = state.sessions.find(x => x.eventId === eventId && x.date === date);
+      if (!s) {s = {id: uid(), eventId, date, present: []}; state.sessions.push(s);}
+      ui.sessionId = s.id;
+      ui.q = '';
+      commit();
+    };
 
-/* ========== Utils ========== */
-const $ = s => document.querySelector(s);
-const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
-const fmtDate = iso => (iso ? iso.split('-').reverse().join('/') : '');
-const move = (arr, i, d) => { const j = i + d; if (j >= 0 && j < arr.length) [arr[i], arr[j]] = [arr[j], arr[i]]; };
-const ask = (msg, def = '') => (prompt(msg, def) || '').trim();
+    /* ========== Ranking ========== */
+    const valueIndex = (p, t) => {
+      const i = t.values.findIndex(v => v.id === p.traits[t.id]);
+      return i < 0 ? 999 : i;
+    };
+    // Sort by trait priority first, then by value rank, then by name
+    const sortPeople = list => [...list].sort((a, b) => {
+      for (const t of inst().traits) {
+        const d = valueIndex(a, t) - valueIndex(b, t);
+        if (d) return d;
+      }
+      return a.name.localeCompare(b.name);
+    });
 
-const age = birth => {
-  if (!birth) return '';
-  const b = new Date(birth + 'T00:00'), n = new Date();
-  let a = n.getFullYear() - b.getFullYear();
-  if (n < new Date(n.getFullYear(), b.getMonth(), b.getDate())) a--;
-  return a;
-};
+    /* ========== Shared UI pieces ========== */
+    const avatar = p => p.photo
+      ? `<img class="av" src="${p.photo}" alt="">`
+      : `<div class="av ph">${esc((p.name[0] || '?').toUpperCase())}</div>`;
 
-// Date math on ISO strings (UTC, so DST never shifts a day)
-const addDays = (iso, n) => {
-  const d = new Date(iso + 'T00:00:00Z');
-  d.setUTCDate(d.getUTCDate() + n);
-  return d.toISOString().slice(0, 10);
-};
-// Keeps the day of month, clamped to the last day (Jan 31 + 1 month = Feb 28)
-const addMonths = (iso, n) => {
-  const [y, m, day] = iso.split('-').map(Number);
-  const first = new Date(Date.UTC(y, m - 1 + n, 1));
-  const last = new Date(Date.UTC(first.getUTCFullYear(), first.getUTCMonth() + 1, 0)).getUTCDate();
-  first.setUTCDate(Math.min(day, last));
-  return first.toISOString().slice(0, 10);
-};
+    const badges = p => inst().traits.map(t => {
+      const v = t.values.find(v => v.id === p.traits[t.id]);
+      return v ? `<span class="tag">${esc(t.name)}: ${esc(v.name)}</span>` : '';
+    }).join('');
 
-// Resize and center-crop the photo to a 256px square JPEG data URL
-const readPhoto = file => new Promise((res, rej) => {
-  const img = new Image();
-  img.onload = () => {
-    const c = document.createElement('canvas');
-    c.width = c.height = 256;
-    const m = Math.min(img.width, img.height);
-    c.getContext('2d').drawImage(img, (img.width - m) / 2, (img.height - m) / 2, m, m, 0, 0, 256, 256);
-    URL.revokeObjectURL(img.src);
-    res(c.toDataURL('image/jpeg', 0.75));
-  };
-  img.onerror = rej;
-  img.src = URL.createObjectURL(file);
-});
+    const deptTags = p => p.depts.map(deptName).filter(Boolean).map(n => `<span class="tag dp">${esc(n)}</span>`).join('');
 
-/* ========== Scoped selectors (current institution / event / session) ========== */
-const inst = () => state.institutions.find(i => i.id === ui.instId);
-const instPeople = () => state.people.filter(p => p.instId === ui.instId);
-const instEvents = () => state.events.filter(e => e.instId === ui.instId);
-const curEvent = () => state.events.find(e => e.id === ui.eventId);
-const curSession = () => state.sessions.find(s => s.id === ui.sessionId);
-const eventSessions = id => state.sessions.filter(s => s.eventId === id);
-const deptName = id => inst().depts.find(d => d.id === id)?.name || '';
-
-// Who is expected at an event: everybody, or only the members of its department
-const inEvent = (p, ev) => !ev.deptId || p.depts.includes(ev.deptId);
-const eventPeople = ev => instPeople().filter(p => inEvent(p, ev));
-
-/* ========== Events: recurrence ========== */
-// Every date of the event from its start until today
-const occurrences = ev => {
-  if (ev.repeat === 'none') return [ev.start];
-  const step = { daily: 1, weekly: 7, biweekly: 14 }[ev.repeat];
-  const out = [];
-  for (let i = 0; out.length < 1000; i++) {
-    const d = ev.repeat === 'monthly' ? addMonths(ev.start, i) : addDays(ev.start, i * step);
-    if (d > today()) break;
-    out.push(d);
-  }
-  return out;
-};
-// Occurrences that still have no roll call (most recent first, max 6)
-const pendingDates = ev => {
-  const done = new Set(eventSessions(ev.id).map(s => s.date));
-  return occurrences(ev).filter(d => !done.has(d)).reverse().slice(0, 6);
-};
-// Opens the roll call of that date, creating it if needed
-const createSession = (eventId, date) => {
-  let s = state.sessions.find(x => x.eventId === eventId && x.date === date);
-  if (!s) { s = { id: uid(), eventId, date, present: [] }; state.sessions.push(s); }
-  ui.sessionId = s.id;
-  ui.q = '';
-  commit();
-};
-
-/* ========== Ranking ========== */
-const valueIndex = (p, t) => {
-  const i = t.values.findIndex(v => v.id === p.traits[t.id]);
-  return i < 0 ? 999 : i;
-};
-// Sort by trait priority first, then by value rank, then by name
-const sortPeople = list => [...list].sort((a, b) => {
-  for (const t of inst().traits) {
-    const d = valueIndex(a, t) - valueIndex(b, t);
-    if (d) return d;
-  }
-  return a.name.localeCompare(b.name);
-});
-
-/* ========== Shared UI pieces ========== */
-const avatar = p => p.photo
-  ? `<img class="av" src="${p.photo}" alt="">`
-  : `<div class="av ph">${esc((p.name[0] || '?').toUpperCase())}</div>`;
-
-const badges = p => inst().traits.map(t => {
-  const v = t.values.find(v => v.id === p.traits[t.id]);
-  return v ? `<span class="tag">${esc(t.name)}: ${esc(v.name)}</span>` : '';
-}).join('');
-
-const deptTags = p => p.depts.map(deptName).filter(Boolean).map(n => `<span class="tag dp">${esc(n)}</span>`).join('');
-
-const matchQ = p => (!ui.dq || p.depts.includes(ui.dq)) && (!ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase()));
-const openDlg = html => { $('#dlg').innerHTML = html; $('#dlg').showModal(); };
-const dlgButtons = (extra = '') => `
+    const matchQ = p => (!ui.dq || p.depts.includes(ui.dq)) && (!ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase()));
+    const openDlg = html => {$('#dlg').innerHTML = html; $('#dlg').showModal();};
+    const dlgButtons = (extra = '') => `
   <div class="row">
     <button type="button" data-act="closeDlg">Cancelar</button>${extra}
     <span class="sp"></span><button class="primary">Salvar</button>
   </div>`;
-const selectOpt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
+    const selectOpt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
 
-/* ========== View: Institutions (home) ========== */
-const homeView = () => `
+    /* ========== View: Institutions (home) ========== */
+    const homeView = () => `
   <button class="primary" data-act="addInst">+ Nova instituição</button>
   ${state.institutions.map(i => `
   <div class="card" data-act="openInst" data-id="${i.id}">
@@ -241,8 +551,8 @@ const homeView = () => `
   </div>`).join('') || '<p class="empty">Crie sua primeira instituição.</p>'}
   ${backupView()}`;
 
-/* ========== View: People ========== */
-const peopleList = () => sortPeople(instPeople()).filter(matchQ).map(p => `
+    /* ========== View: People ========== */
+    const peopleList = () => sortPeople(instPeople()).filter(matchQ).map(p => `
   <div class="card" data-act="editPerson" data-id="${p.id}">
     ${avatar(p)}
     <div>
@@ -252,16 +562,16 @@ const peopleList = () => sortPeople(instPeople()).filter(matchQ).map(p => `
     </div>
   </div>`).join('') || '<p class="empty">Nenhuma pessoa.</p>';
 
-const peopleView = () => `
+    const peopleView = () => `
   <button class="primary" data-act="newPerson">+ Nova pessoa</button>
   <input id="q" placeholder="Buscar nome ou telefone…" value="${esc(ui.q)}">
   ${inst().depts.length ? `<select id="deptF">${selectOpt('', 'Todos os departamentos', ui.dq)}${inst().depts.map(d => selectOpt(d.id, d.name, ui.dq)).join('')}</select>` : ''}
   <div id="list" class="col">${peopleList()}</div>`;
 
-const personDialog = id => {
-  const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: [] };
-  photoTmp = p.photo;
-  openDlg(`
+    const personDialog = id => {
+      const p = state.people.find(x => x.id === id) || {id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: []};
+      photoTmp = p.photo;
+      openDlg(`
   <form id="personForm" data-id="${p.id}">
     <div class="row">
       <img id="pv" class="av" src="${p.photo}" ${p.photo ? '' : 'hidden'} alt="">
@@ -284,23 +594,23 @@ const personDialog = id => {
       </div>` : ''}
     ${dlgButtons(p.id ? `<button type="button" class="danger" data-act="delPerson" data-id="${p.id}">Excluir</button>` : '')}
   </form>`);
-};
+    };
 
-const savePerson = (f, id) => {
-  const data = {
-    name: f.get('name').trim(), phone: f.get('phone').trim(), birth: f.get('birth'), photo: photoTmp,
-    traits: {},
-    depts: inst().depts.filter(d => f.get('d_' + d.id)).map(d => d.id)
-  };
-  inst().traits.forEach(t => { const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v; });
-  if (id) Object.assign(state.people.find(p => p.id === id), data);
-  else state.people.push({ id: uid(), instId: ui.instId, ...data });
-  $('#dlg').close();
-  commit();
-};
+    const savePerson = (f, id) => {
+      const data = {
+        name: f.get('name').trim(), phone: f.get('phone').trim(), birth: f.get('birth'), photo: photoTmp,
+        traits: {},
+        depts: inst().depts.filter(d => f.get('d_' + d.id)).map(d => d.id)
+      };
+      inst().traits.forEach(t => {const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v;});
+      if (id) Object.assign(state.people.find(p => p.id === id), data);
+      else state.people.push({id: uid(), instId: ui.instId, ...data});
+      $('#dlg').close();
+      commit();
+    };
 
-/* ========== View: Traits ========== */
-const traitsView = () => `
+    /* ========== View: Traits ========== */
+    const traitsView = () => `
   <button class="primary" data-act="addTrait">+ Atributo</button>
   <p class="hint">A ordem define a superioridade: o topo é o mais alto. Pessoas são ordenadas pelos atributos na ordem listada.</p>
   ${inst().traits.map((t, ti) => `
@@ -323,8 +633,8 @@ const traitsView = () => `
     <button data-act="addValue" data-i="${ti}">+ Valor</button>
   </section>`).join('')}`;
 
-/* ========== View: Departments ========== */
-const deptsView = () => `
+    /* ========== View: Departments ========== */
+    const deptsView = () => `
   <button class="primary" data-act="addDept">+ Departamento</button>
   <p class="hint">Toque em um departamento para ver seus membros. Atribua pessoas a ele no cadastro delas.</p>
   ${inst().depts.map(d => `
@@ -338,29 +648,29 @@ const deptsView = () => `
     <button class="danger" data-act="delDept" data-id="${d.id}">🗑</button>
   </div>`).join('') || '<p class="empty">Nenhum departamento.</p>'}`;
 
-/* ========== View: Events ========== */
-const lastDate = ev => eventSessions(ev.id).map(s => s.date).sort().pop() || '';
+    /* ========== View: Events ========== */
+    const lastDate = ev => eventSessions(ev.id).map(s => s.date).sort().pop() || '';
 
-const eventsView = () => {
-  const groups = [{ id: '', name: 'Toda a instituição' }, ...inst().depts];
-  const card = ev => `
+    const eventsView = () => {
+      const groups = [{id: '', name: 'Toda a instituição'}, ...inst().depts];
+      const card = ev => `
   <div class="card" data-act="openEvent" data-id="${ev.id}">
     <div>
       <b>${esc(ev.name)}</b>
       <div class="sub">${REPEAT[ev.repeat]} · ${eventSessions(ev.id).length} chamadas${lastDate(ev) ? ` · última ${fmtDate(lastDate(ev))}` : ''}</div>
     </div>
   </div>`;
-  const body = groups.map(g => {
-    const list = instEvents().filter(e => e.deptId === g.id);
-    return list.length ? `<b class="grp">${esc(g.name)}</b>${list.map(card).join('')}` : '';
-  }).join('');
-  return `<button class="primary" data-act="newEvent">+ Novo evento</button>${body || '<p class="empty">Nenhum evento. Crie um (ex.: Culto de domingo).</p>'}`;
-};
+      const body = groups.map(g => {
+        const list = instEvents().filter(e => e.deptId === g.id);
+        return list.length ? `<b class="grp">${esc(g.name)}</b>${list.map(card).join('')}` : '';
+      }).join('');
+      return `<button class="primary" data-act="newEvent">+ Novo evento</button>${body || '<p class="empty">Nenhum evento. Crie um (ex.: Culto de domingo).</p>'}`;
+    };
 
-const eventView = () => {
-  const ev = curEvent();
-  const pend = pendingDates(ev);
-  return `
+    const eventView = () => {
+      const ev = curEvent();
+      const pend = pendingDates(ev);
+      return `
   <div class="row">
     <button data-act="backEvents">←</button>
     <b>${esc(ev.name)}</b><span class="sp"></span>
@@ -378,11 +688,11 @@ const eventView = () => {
   <div class="card" data-act="openSession" data-id="${s.id}">
     <b>${fmtDate(s.date)}</b><span class="sp"></span><b>${s.present.length} presentes</b>
   </div>`).join('') || '<p class="empty">Nenhuma chamada feita.</p>'}`;
-};
+    };
 
-const eventDialog = id => {
-  const ev = state.events.find(x => x.id === id) || { id: '', name: '', deptId: '', repeat: 'weekly', start: today() };
-  openDlg(`
+    const eventDialog = id => {
+      const ev = state.events.find(x => x.id === id) || {id: '', name: '', deptId: '', repeat: 'weekly', start: today()};
+      openDlg(`
   <form id="eventForm" data-id="${ev.id}">
     <label>Nome<input name="name" required placeholder="Ex.: Culto de domingo" value="${esc(ev.name)}"></label>
     <label>Pertence a
@@ -397,40 +707,40 @@ const eventDialog = id => {
     <label>Primeira data<input name="start" type="date" required value="${ev.start}"></label>
     ${dlgButtons(ev.id ? `<button type="button" class="danger" data-act="delEvent" data-id="${ev.id}">Excluir</button>` : '')}
   </form>`);
-};
+    };
 
-const saveEvent = (f, id) => {
-  const data = { name: f.get('name').trim(), deptId: f.get('deptId'), repeat: f.get('repeat'), start: f.get('start') };
-  if (id) Object.assign(state.events.find(e => e.id === id), data);
-  else {
-    const ev = { id: uid(), instId: ui.instId, ...data };
-    state.events.push(ev);
-    ui.eventId = ev.id;
-  }
-  $('#dlg').close();
-  commit();
-};
+    const saveEvent = (f, id) => {
+      const data = {name: f.get('name').trim(), deptId: f.get('deptId'), repeat: f.get('repeat'), start: f.get('start')};
+      if (id) Object.assign(state.events.find(e => e.id === id), data);
+      else {
+        const ev = {id: uid(), instId: ui.instId, ...data};
+        state.events.push(ev);
+        ui.eventId = ev.id;
+      }
+      $('#dlg').close();
+      commit();
+    };
 
-const dateDialog = () => openDlg(`
+    const dateDialog = () => openDlg(`
   <form id="dateForm">
     <label>Data da chamada<input name="date" type="date" required value="${today()}"></label>
     ${dlgButtons()}
   </form>`);
 
-/* ========== View: Roll call ========== */
-const rollList = () => {
-  const s = curSession();
-  return sortPeople(eventPeople(curEvent())).filter(matchQ).map(p => {
-    const on = s.present.includes(p.id);
-    return `<div class="card ${on ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
+    /* ========== View: Roll call ========== */
+    const rollList = () => {
+      const s = curSession();
+      return sortPeople(eventPeople(curEvent())).filter(matchQ).map(p => {
+        const on = s.present.includes(p.id);
+        return `<div class="card ${on ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
       ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p)}</div></div>
       <span class="sp"></span><span class="chk">${on ? '✔' : ''}</span></div>`;
-  }).join('') || '<p class="empty">Nenhuma pessoa.</p>';
-};
+      }).join('') || '<p class="empty">Nenhuma pessoa.</p>';
+    };
 
-const rollCall = () => {
-  const s = curSession(), ev = curEvent();
-  return `
+    const rollCall = () => {
+      const s = curSession(), ev = curEvent();
+      return `
   <div class="row">
     <button data-act="backEvent">←</button>
     <b>${esc(ev.name)} · ${fmtDate(s.date)}</b><span class="sp"></span>
@@ -439,47 +749,47 @@ const rollCall = () => {
   <div class="big" id="cnt">${s.present.length} / ${eventPeople(ev).length}</div>
   <input id="q" placeholder="Buscar…" value="${esc(ui.q)}">
   <div id="list" class="col">${rollList()}</div>`;
-};
+    };
 
-const attView = () => ui.sessionId ? rollCall() : ui.eventId ? eventView() : eventsView();
+    const attView = () => ui.sessionId ? rollCall() : ui.eventId ? eventView() : eventsView();
 
-/* ========== View: Stats ========== */
-const statsView = () => {
-  const a = ui.an, traits = inst().traits, depts = inst().depts, evs = instEvents();
-  const t = traits.find(x => x.id === a.traitId);
-  const evOf = s => evs.find(e => e.id === s.eventId);
-  const evOptions = evs.filter(e => !a.deptId || e.deptId === a.deptId);
+    /* ========== View: Stats ========== */
+    const statsView = () => {
+      const a = ui.an, traits = inst().traits, depts = inst().depts, evs = instEvents();
+      const t = traits.find(x => x.id === a.traitId);
+      const evOf = s => evs.find(e => e.id === s.eventId);
+      const evOptions = evs.filter(e => !a.deptId || e.deptId === a.deptId);
 
-  const evIds = new Set(evOptions.filter(e => !a.eventId || e.id === a.eventId).map(e => e.id));
-  const sessions = state.sessions
-    .filter(s => evIds.has(s.eventId) && (!a.from || s.date >= a.from) && (!a.to || s.date <= a.to))
-    .sort((x, y) => x.date.localeCompare(y.date));
-  const people = instPeople().filter(p =>
-    (!a.deptId || p.depts.includes(a.deptId)) && (!t || !a.valueId || p.traits[t.id] === a.valueId));
-  const n = sessions.length;
+      const evIds = new Set(evOptions.filter(e => !a.eventId || e.id === a.eventId).map(e => e.id));
+      const sessions = state.sessions
+        .filter(s => evIds.has(s.eventId) && (!a.from || s.date >= a.from) && (!a.to || s.date <= a.to))
+        .sort((x, y) => x.date.localeCompare(y.date));
+      const people = instPeople().filter(p =>
+        (!a.deptId || p.depts.includes(a.deptId)) && (!t || !a.valueId || p.traits[t.id] === a.valueId));
+      const n = sessions.length;
 
-  // Each session is measured against the people expected at its event
-  const perSession = sessions.map(s => {
-    const elig = people.filter(p => inEvent(p, evOf(s)));
-    return { s, c: elig.filter(p => s.present.includes(p.id)).length, tot: elig.length };
-  });
-  const avg = n ? perSession.reduce((sum, x) => sum + x.c, 0) / n : 0;
-  const rate = n ? Math.round(perSession.reduce((sum, x) => sum + (x.tot ? x.c / x.tot : 0), 0) / n * 100) : 0;
+      // Each session is measured against the people expected at its event
+      const perSession = sessions.map(s => {
+        const elig = people.filter(p => inEvent(p, evOf(s)));
+        return {s, c: elig.filter(p => s.present.includes(p.id)).length, tot: elig.length};
+      });
+      const avg = n ? perSession.reduce((sum, x) => sum + x.c, 0) / n : 0;
+      const rate = n ? Math.round(perSession.reduce((sum, x) => sum + (x.tot ? x.c / x.tot : 0), 0) / n * 100) : 0;
 
-  const rows = people.map(p => {
-    const el = sessions.filter(s => inEvent(p, evOf(s)));
-    const hits = el.filter(s => s.present.includes(p.id));
-    return { p, c: hits.length, tot: el.length, pct: el.length ? hits.length / el.length * 100 : 0, last: hits.length ? hits[hits.length - 1].date : '' };
-  }).sort((x, y) => y.pct - x.pct || x.p.name.localeCompare(y.p.name));
+      const rows = people.map(p => {
+        const el = sessions.filter(s => inEvent(p, evOf(s)));
+        const hits = el.filter(s => s.present.includes(p.id));
+        return {p, c: hits.length, tot: el.length, pct: el.length ? hits.length / el.length * 100 : 0, last: hits.length ? hits[hits.length - 1].date : ''};
+      }).sort((x, y) => y.pct - x.pct || x.p.name.localeCompare(y.p.name));
 
-  const last3 = sessions.slice(-3);
-  const absent = n >= 3 ? people.filter(p => {
-    const el = last3.filter(s => inEvent(p, evOf(s)));
-    return el.length && el.every(s => !s.present.includes(p.id));
-  }) : [];
+      const last3 = sessions.slice(-3);
+      const absent = n >= 3 ? people.filter(p => {
+        const el = last3.filter(s => inEvent(p, evOf(s)));
+        return el.length && el.every(s => !s.present.includes(p.id));
+      }) : [];
 
-  const evName = id => evs.find(e => e.id === id)?.name || '';
-  return `
+      const evName = id => evs.find(e => e.id === id)?.name || '';
+      return `
   <section class="box">
     ${depts.length ? `<select data-f="deptId">${selectOpt('', 'Todos os departamentos', a.deptId)}${depts.map(d => selectOpt(d.id, d.name, a.deptId)).join('')}</select>` : ''}
     <select data-f="eventId">${selectOpt('', 'Todos os eventos', a.eventId)}${evOptions.map(e => selectOpt(e.id, e.name, a.eventId)).join('')}</select>
@@ -508,10 +818,10 @@ const statsView = () => {
     </table></div>
   </section>
   ${n >= 3 ? `<section class="box"><b>Ausentes nas últimas 3 chamadas</b>${absent.map(p => `<div>${esc(p.name)}</div>`).join('') || '<p class="empty">Ninguém.</p>'}</section>` : ''}`;
-};
+    };
 
-/* ========== Backup ========== */
-const backupView = () => `
+    /* ========== Backup ========== */
+    const backupView = () => `
   <section class="box">
     <b>Backup</b>
     <p class="hint">${state.institutions.length} instituições · ${state.people.length} pessoas · ${state.events.length} eventos · ${state.sessions.length} chamadas</p>
@@ -519,242 +829,243 @@ const backupView = () => `
     <label>Importar backup (substitui os dados atuais)<input type="file" id="importIn" accept="application/json,.json"></label>
   </section>`;
 
-// Converts any saved/backup format into the current one
-// v1: no institutions or events | v2: no departments | v3: current
-const migrate = d => {
-  const people = (d.people || []).map(p => ({ ...p, traits: p.traits || {}, depts: p.depts || [] }));
-  const sessions = (d.sessions || []).map(s => ({ ...s, present: s.present || [] }));
-  const fixTraits = list => (list || []).map(t => ({ ...t, values: t.values || [] }));
+    // Converts any saved/backup format into the current one
+    // v1: no institutions or events | v2: no departments | v3: current
+    const migrate = d => {
+      const people = (d.people || []).map(p => ({...p, traits: p.traits || {}, depts: p.depts || []}));
+      const sessions = (d.sessions || []).map(s => ({...s, present: s.present || []}));
+      const fixTraits = list => (list || []).map(t => ({...t, values: t.values || []}));
 
-  if (Array.isArray(d.institutions)) {
-    return {
-      institutions: d.institutions.map(i => ({ ...i, traits: fixTraits(i.traits), depts: i.depts || [] })),
-      people,
-      events: (d.events || []).map(e => ({ ...e, deptId: e.deptId || '' })),
-      sessions
+      if (Array.isArray(d.institutions)) {
+        return {
+          institutions: d.institutions.map(i => ({...i, traits: fixTraits(i.traits), depts: i.depts || []})),
+          people,
+          events: (d.events || []).map(e => ({...e, deptId: e.deptId || ''})),
+          sessions
+        };
+      }
+
+      // v1: everything goes into one institution; each distinct roll call name becomes an event
+      const institution = {id: uid(), name: 'Minha instituição', traits: fixTraits(d.traits), depts: []};
+      const events = [];
+      sessions.forEach(s => {
+        const name = s.name || 'Chamada';
+        let ev = events.find(e => e.name === name);
+        if (!ev) {ev = {id: uid(), instId: institution.id, deptId: '', name, repeat: 'none', start: s.date}; events.push(ev);}
+        if (s.date < ev.start) ev.start = s.date;
+        s.eventId = ev.id;
+        delete s.name;
+      });
+      return {institutions: [institution], people: people.map(p => ({...p, instId: institution.id})), events, sessions};
     };
-  }
 
-  // v1: everything goes into one institution; each distinct roll call name becomes an event
-  const institution = { id: uid(), name: 'Minha instituição', traits: fixTraits(d.traits), depts: [] };
-  const events = [];
-  sessions.forEach(s => {
-    const name = s.name || 'Chamada';
-    let ev = events.find(e => e.name === name);
-    if (!ev) { ev = { id: uid(), instId: institution.id, deptId: '', name, repeat: 'none', start: s.date }; events.push(ev); }
-    if (s.date < ev.start) ev.start = s.date;
-    s.eventId = ev.id;
-    delete s.name;
-  });
-  return { institutions: [institution], people: people.map(p => ({ ...p, instId: institution.id })), events, sessions };
-};
+    const exportData = () => {
+      const blob = new Blob([JSON.stringify({app: 'members', version: 3, exportedAt: new Date().toISOString(), ...state})], {type: 'application/json'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `members-${today()}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    };
 
-const exportData = () => {
-  const blob = new Blob([JSON.stringify({ app: 'members', version: 3, exportedAt: new Date().toISOString(), ...state })], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = `members-${today()}.json`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
-};
+    const importData = async file => {
+      try {
+        const d = JSON.parse(await file.text());
+        if (!Array.isArray(d.people) || !Array.isArray(d.sessions) || !(Array.isArray(d.institutions) || Array.isArray(d.traits))) throw new Error('invalid');
+        if (!confirm(`Substituir os dados atuais por ${d.people.length} pessoas e ${d.sessions.length} chamadas?`)) return;
+        state = migrate(d);
+        resetNav(null);
+        commit();
+        alert('Backup importado.');
+      } catch {alert('Arquivo inválido.');}
+    };
 
-const importData = async file => {
-  try {
-    const d = JSON.parse(await file.text());
-    if (!Array.isArray(d.people) || !Array.isArray(d.sessions) || !(Array.isArray(d.institutions) || Array.isArray(d.traits))) throw new Error('invalid');
-    if (!confirm(`Substituir os dados atuais por ${d.people.length} pessoas e ${d.sessions.length} chamadas?`)) return;
-    state = migrate(d);
-    resetNav(null);
-    commit();
-    alert('Backup importado.');
-  } catch { alert('Arquivo inválido.'); }
-};
+    /* ========== Actions (click delegation) ========== */
+    const resetNav = instId => {
+      Object.assign(ui, {instId, tab: 'people', q: '', dq: '', eventId: null, sessionId: null});
+      ui.an = {deptId: '', eventId: '', traitId: '', valueId: '', from: '', to: ''};
+    };
+    const dropTraitFromPeople = (tid, vid) => state.people.forEach(p => {
+      if (!vid || p.traits[tid] === vid) delete p.traits[tid];
+    });
+    const removeEvent = id => {
+      state.sessions = state.sessions.filter(s => s.eventId !== id);
+      state.events = state.events.filter(e => e.id !== id);
+    };
 
-/* ========== Actions (click delegation) ========== */
-const resetNav = instId => {
-  Object.assign(ui, { instId, tab: 'people', q: '', dq: '', eventId: null, sessionId: null });
-  ui.an = { deptId: '', eventId: '', traitId: '', valueId: '', from: '', to: '' };
-};
-const dropTraitFromPeople = (tid, vid) => state.people.forEach(p => {
-  if (!vid || p.traits[tid] === vid) delete p.traits[tid];
-});
-const removeEvent = id => {
-  state.sessions = state.sessions.filter(s => s.eventId !== id);
-  state.events = state.events.filter(e => e.id !== id);
-};
+    const act = {
+      tab: el => {ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.eventId = null; ui.sessionId = null; render();},
+      closeDlg: () => $('#dlg').close(),
 
-const act = {
-  tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.eventId = null; ui.sessionId = null; render(); },
-  closeDlg: () => $('#dlg').close(),
+      home: () => {resetNav(null); render();},
+      addInst: () => {const n = ask('Nome da instituição:'); if (n) {state.institutions.push({id: uid(), name: n, traits: [], depts: []}); commit();} },
+      openInst: el => {resetNav(el.dataset.id); render();},
+      renInst: el => {
+        const i = state.institutions.find(x => x.id === el.dataset.id);
+        const n = ask('Novo nome:', i.name);
+        if (n) {i.name = n; commit();}
+      },
+      delInst: el => {
+        const id = el.dataset.id, i = state.institutions.find(x => x.id === id);
+        if (!confirm(`Excluir "${i.name}" com todas as pessoas, eventos e chamadas?`)) return;
+        state.events.filter(e => e.instId === id).forEach(e => removeEvent(e.id));
+        state.people = state.people.filter(p => p.instId !== id);
+        state.institutions = state.institutions.filter(x => x.id !== id);
+        commit();
+      },
 
-  home: () => { resetNav(null); render(); },
-  addInst: () => { const n = ask('Nome da instituição:'); if (n) { state.institutions.push({ id: uid(), name: n, traits: [], depts: [] }); commit(); } },
-  openInst: el => { resetNav(el.dataset.id); render(); },
-  renInst: el => {
-    const i = state.institutions.find(x => x.id === el.dataset.id);
-    const n = ask('Novo nome:', i.name);
-    if (n) { i.name = n; commit(); }
-  },
-  delInst: el => {
-    const id = el.dataset.id, i = state.institutions.find(x => x.id === id);
-    if (!confirm(`Excluir "${i.name}" com todas as pessoas, eventos e chamadas?`)) return;
-    state.events.filter(e => e.instId === id).forEach(e => removeEvent(e.id));
-    state.people = state.people.filter(p => p.instId !== id);
-    state.institutions = state.institutions.filter(x => x.id !== id);
-    commit();
-  },
+      newPerson: () => personDialog(''),
+      editPerson: el => personDialog(el.dataset.id),
+      delPerson: el => {
+        if (!confirm('Excluir esta pessoa?')) return;
+        const id = el.dataset.id;
+        state.people = state.people.filter(p => p.id !== id);
+        state.sessions.forEach(s => {s.present = s.present.filter(x => x !== id);});
+        $('#dlg').close();
+        commit();
+      },
 
-  newPerson: () => personDialog(''),
-  editPerson: el => personDialog(el.dataset.id),
-  delPerson: el => {
-    if (!confirm('Excluir esta pessoa?')) return;
-    const id = el.dataset.id;
-    state.people = state.people.filter(p => p.id !== id);
-    state.sessions.forEach(s => { s.present = s.present.filter(x => x !== id); });
-    $('#dlg').close();
-    commit();
-  },
+      addTrait: () => {const n = ask('Nome do atributo (ex.: Cargo):'); if (n) {inst().traits.push({id: uid(), name: n, values: []}); commit();} },
+      renTrait: el => {const t = inst().traits[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) {t.name = n; commit();} },
+      moveTrait: el => {move(inst().traits, +el.dataset.i, +el.dataset.d); commit();},
+      delTrait: el => {
+        const t = inst().traits[el.dataset.i];
+        if (!confirm(`Excluir "${t.name}" e seus valores?`)) return;
+        dropTraitFromPeople(t.id);
+        inst().traits.splice(el.dataset.i, 1);
+        commit();
+      },
 
-  addTrait: () => { const n = ask('Nome do atributo (ex.: Cargo):'); if (n) { inst().traits.push({ id: uid(), name: n, values: [] }); commit(); } },
-  renTrait: el => { const t = inst().traits[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) { t.name = n; commit(); } },
-  moveTrait: el => { move(inst().traits, +el.dataset.i, +el.dataset.d); commit(); },
-  delTrait: el => {
-    const t = inst().traits[el.dataset.i];
-    if (!confirm(`Excluir "${t.name}" e seus valores?`)) return;
-    dropTraitFromPeople(t.id);
-    inst().traits.splice(el.dataset.i, 1);
-    commit();
-  },
+      addValue: el => {const n = ask('Nome do valor (ex.: Pastor):'); if (n) {inst().traits[el.dataset.i].values.push({id: uid(), name: n}); commit();} },
+      renVal: el => {const v = inst().traits[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) {v.name = n; commit();} },
+      moveVal: el => {move(inst().traits[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit();},
+      delVal: el => {
+        const t = inst().traits[el.dataset.i], v = t.values[el.dataset.j];
+        if (!confirm(`Excluir "${v.name}"?`)) return;
+        dropTraitFromPeople(t.id, v.id);
+        t.values.splice(el.dataset.j, 1);
+        commit();
+      },
 
-  addValue: el => { const n = ask('Nome do valor (ex.: Pastor):'); if (n) { inst().traits[el.dataset.i].values.push({ id: uid(), name: n }); commit(); } },
-  renVal: el => { const v = inst().traits[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) { v.name = n; commit(); } },
-  moveVal: el => { move(inst().traits[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit(); },
-  delVal: el => {
-    const t = inst().traits[el.dataset.i], v = t.values[el.dataset.j];
-    if (!confirm(`Excluir "${v.name}"?`)) return;
-    dropTraitFromPeople(t.id, v.id);
-    t.values.splice(el.dataset.j, 1);
-    commit();
-  },
+      addDept: () => {const n = ask('Nome do departamento (ex.: Varões):'); if (n) {inst().depts.push({id: uid(), name: n}); commit();} },
+      renDept: el => {
+        const d = inst().depts.find(x => x.id === el.dataset.id);
+        const n = ask('Novo nome:', d.name);
+        if (n) {d.name = n; commit();}
+      },
+      delDept: el => {
+        const id = el.dataset.id, d = inst().depts.find(x => x.id === id);
+        if (!confirm(`Excluir "${d.name}" com seus eventos e chamadas? As pessoas continuam na instituição.`)) return;
+        state.events.filter(e => e.deptId === id).forEach(e => removeEvent(e.id));
+        state.people.forEach(p => {p.depts = p.depts.filter(x => x !== id);});
+        inst().depts = inst().depts.filter(x => x.id !== id);
+        commit();
+      },
+      deptPeople: el => {ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; render();},
 
-  addDept: () => { const n = ask('Nome do departamento (ex.: Varões):'); if (n) { inst().depts.push({ id: uid(), name: n }); commit(); } },
-  renDept: el => {
-    const d = inst().depts.find(x => x.id === el.dataset.id);
-    const n = ask('Novo nome:', d.name);
-    if (n) { d.name = n; commit(); }
-  },
-  delDept: el => {
-    const id = el.dataset.id, d = inst().depts.find(x => x.id === id);
-    if (!confirm(`Excluir "${d.name}" com seus eventos e chamadas? As pessoas continuam na instituição.`)) return;
-    state.events.filter(e => e.deptId === id).forEach(e => removeEvent(e.id));
-    state.people.forEach(p => { p.depts = p.depts.filter(x => x !== id); });
-    inst().depts = inst().depts.filter(x => x.id !== id);
-    commit();
-  },
-  deptPeople: el => { ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; render(); },
+      newEvent: () => eventDialog(''),
+      editEvent: el => eventDialog(el.dataset.id),
+      openEvent: el => {ui.eventId = el.dataset.id; render();},
+      backEvents: () => {ui.eventId = null; render();},
+      delEvent: el => {
+        if (!confirm('Excluir este evento e todas as suas chamadas?')) return;
+        removeEvent(el.dataset.id);
+        ui.eventId = null;
+        $('#dlg').close();
+        commit();
+      },
 
-  newEvent: () => eventDialog(''),
-  editEvent: el => eventDialog(el.dataset.id),
-  openEvent: el => { ui.eventId = el.dataset.id; render(); },
-  backEvents: () => { ui.eventId = null; render(); },
-  delEvent: el => {
-    if (!confirm('Excluir este evento e todas as suas chamadas?')) return;
-    removeEvent(el.dataset.id);
-    ui.eventId = null;
-    $('#dlg').close();
-    commit();
-  },
+      pickDate: el => createSession(ui.eventId, el.dataset.date),
+      otherDate: dateDialog,
+      openSession: el => {ui.sessionId = el.dataset.id; ui.q = ''; render();},
+      backEvent: () => {ui.sessionId = null; ui.q = ''; render();},
+      delSession: () => {
+        if (!confirm('Excluir esta chamada?')) return;
+        state.sessions = state.sessions.filter(s => s.id !== ui.sessionId);
+        ui.sessionId = null;
+        commit();
+      },
+      toggle: el => {
+        const s = curSession(), i = s.present.indexOf(el.dataset.id);
+        if (i < 0) s.present.push(el.dataset.id); else s.present.splice(i, 1);
+        save();
+        $('#cnt').textContent = `${s.present.length} / ${eventPeople(curEvent()).length}`;
+        refreshList();
+      },
 
-  pickDate: el => createSession(ui.eventId, el.dataset.date),
-  otherDate: dateDialog,
-  openSession: el => { ui.sessionId = el.dataset.id; ui.q = ''; render(); },
-  backEvent: () => { ui.sessionId = null; ui.q = ''; render(); },
-  delSession: () => {
-    if (!confirm('Excluir esta chamada?')) return;
-    state.sessions = state.sessions.filter(s => s.id !== ui.sessionId);
-    ui.sessionId = null;
-    commit();
-  },
-  toggle: el => {
-    const s = curSession(), i = s.present.indexOf(el.dataset.id);
-    if (i < 0) s.present.push(el.dataset.id); else s.present.splice(i, 1);
-    save();
-    $('#cnt').textContent = `${s.present.length} / ${eventPeople(curEvent()).length}`;
-    refreshList();
-  },
+      export: exportData
+    };
 
-  export: exportData
-};
+    document.addEventListener('click', e => {
+      const el = e.target.closest('[data-act]');
+      if (el) act[el.dataset.act]?.(el);
+    });
 
-document.addEventListener('click', e => {
-  const el = e.target.closest('[data-act]');
-  if (el) act[el.dataset.act]?.(el);
-});
+    const FORMS = {
+      personForm: savePerson,
+      eventForm: saveEvent,
+      dateForm: f => {$('#dlg').close(); createSession(ui.eventId, f.get('date'));}
+    };
+    document.addEventListener('submit', e => {
+      e.preventDefault();
+      FORMS[e.target.id]?.(new FormData(e.target), e.target.dataset.id);
+    });
 
-const FORMS = {
-  personForm: savePerson,
-  eventForm: saveEvent,
-  dateForm: f => { $('#dlg').close(); createSession(ui.eventId, f.get('date')); }
-};
-document.addEventListener('submit', e => {
-  e.preventDefault();
-  FORMS[e.target.id]?.(new FormData(e.target), e.target.dataset.id);
-});
+    document.addEventListener('input', e => {
+      if (e.target.id === 'q') {ui.q = e.target.value; refreshList();}
+    });
 
-document.addEventListener('input', e => {
-  if (e.target.id === 'q') { ui.q = e.target.value; refreshList(); }
-});
+    document.addEventListener('change', async e => {
+      const t = e.target;
+      if (t.id === 'photoIn' && t.files[0]) {
+        photoTmp = await readPhoto(t.files[0]);
+        $('#pv').src = photoTmp;
+        $('#pv').hidden = false;
+      } else if (t.id === 'deptF') {
+        ui.dq = t.value;
+        refreshList();
+      } else if (t.dataset.f) {
+        ui.an[t.dataset.f] = t.value;
+        if (t.dataset.f === 'traitId') ui.an.valueId = '';
+        if (t.dataset.f === 'deptId') ui.an.eventId = '';
+        render();
+      } else if (t.id === 'importIn' && t.files[0]) {
+        await importData(t.files[0]);
+        t.value = '';
+      }
+    });
 
-document.addEventListener('change', async e => {
-  const t = e.target;
-  if (t.id === 'photoIn' && t.files[0]) {
-    photoTmp = await readPhoto(t.files[0]);
-    $('#pv').src = photoTmp;
-    $('#pv').hidden = false;
-  } else if (t.id === 'deptF') {
-    ui.dq = t.value;
-    refreshList();
-  } else if (t.dataset.f) {
-    ui.an[t.dataset.f] = t.value;
-    if (t.dataset.f === 'traitId') ui.an.valueId = '';
-    if (t.dataset.f === 'deptId') ui.an.eventId = '';
-    render();
-  } else if (t.id === 'importIn' && t.files[0]) {
-    await importData(t.files[0]);
-    t.value = '';
-  }
-});
+    /* ========== Render ========== */
+    const TABS = [
+      ['people', 'Pessoas', peopleView], ['traits', 'Atributos', traitsView], ['depts', 'Deptos', deptsView],
+      ['att', 'Eventos', attView], ['stats', 'Análise', statsView]
+    ];
+    const refreshList = () => {$('#list').innerHTML = ui.tab === 'people' ? peopleList() : rollList();};
 
-/* ========== Render ========== */
-const TABS = [
-  ['people', 'Pessoas', peopleView], ['traits', 'Atributos', traitsView], ['depts', 'Deptos', deptsView],
-  ['att', 'Eventos', attView], ['stats', 'Análise', statsView]
-];
-const refreshList = () => { $('#list').innerHTML = ui.tab === 'people' ? peopleList() : rollList(); };
+    function render() {
+      if (ui.instId && !inst()) resetNav(null);
+      const [, label, view] = ui.instId ? TABS.find(t => t[0] === ui.tab) : [0, 'MEMBERS', homeView];
 
-function render() {
-  if (ui.instId && !inst()) resetNav(null);
-  const [, label, view] = ui.instId ? TABS.find(t => t[0] === ui.tab) : [0, 'MEMBERS', homeView];
+      $('#head').innerHTML = `${ui.instId ? '<button data-act="home">←</button>' : ''}<h1>${esc(ui.instId ? `${inst().name} · ${label}` : label)}</h1>`;
+      $('#tabs').hidden = !ui.instId;
+      $('#tabs').innerHTML = TABS.map(([k, l]) => `<button data-act="tab" data-k="${k}" class="${ui.tab === k ? 'on' : ''}">${l}</button>`).join('');
+      $('#view').innerHTML = view();
+    }
 
-  $('#head').innerHTML = `${ui.instId ? '<button data-act="home">←</button>' : ''}<h1>${esc(ui.instId ? `${inst().name} · ${label}` : label)}</h1>`;
-  $('#tabs').hidden = !ui.instId;
-  $('#tabs').innerHTML = TABS.map(([k, l]) => `<button data-act="tab" data-k="${k}" class="${ui.tab === k ? 'on' : ''}">${l}</button>`).join('');
-  $('#view').innerHTML = view();
-}
-
-/* ========== Init ========== */
-(async () => {
-  resetNav(null);
-  const saved = await DB.get('state');
-  if (saved) {
-    const outdated = !saved.institutions || saved.institutions.some(i => !i.depts);
-    state = migrate(saved);
-    if (outdated) save();
-  }
-  render();
-  navigator.storage?.persist?.();
-  if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
-})();
-</script>
+    /* ========== Init ========== */
+    (async () => {
+      resetNav(null);
+      const saved = await DB.get('state');
+      if (saved) {
+        const outdated = !saved.institutions || saved.institutions.some(i => !i.depts);
+        state = migrate(saved);
+        if (outdated) save();
+      }
+      render();
+      navigator.storage?.persist?.();
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    })();
+  </script>
 </body>
+
 </html>

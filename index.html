@@ -16,13 +16,10 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://crcsdev.github.io/MEMBERS/">
 
-  <!-- Mobile / PWA -->
-  <link rel="apple-touch-icon" href="/apple-icon.png">
-
   <!-- Open Graph (WhatsApp, Facebook, Telegram) -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="MEMBERS">
-  <meta property="og:title" content="MEMBERS>
+  <meta property="og:title" content="MEMBERS">
   <meta property="og:description" content="Gerencie seu grupo de pessoas.">
   <meta property="og:url" content="https://crcsdev.github.io/MEMBERS/">
   <meta property="og:image" content="https://crcsdev.github.io/MEMBERS/og-image.png">
@@ -44,329 +41,62 @@
       "description": "Gerencie seu grupo de pessoas",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any",
-      "image": "https://crcsdev.github.io/MEMBERS/icon512.png",
+      "image": "https://crcsdev.github.io/MEMBERS/icon-512.png",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
   </script>
 
   <title>MEMBERS</title>
   <style>
-    :root {
-      --bg: #f3f4f6;
-      --card: #fff;
-      --tx: #111827;
-      --sub: #6b7280;
-      --pri: #2563eb;
-      --bd: #e5e7eb;
-      --dng: #dc2626
-    }
-
-    @media(prefers-color-scheme:dark) {
-      :root {
-        --bg: #111827;
-        --card: #1f2937;
-        --tx: #f9fafb;
-        --sub: #9ca3af;
-        --bd: #374151
-      }
-    }
-
-    * {
-      box-sizing: border-box
-    }
-
-    html {
-      -webkit-text-size-adjust: 100%
-    }
-
-    body {
-      margin: 0;
-      background: var(--bg);
-      color: var(--tx);
-      font: 16px system-ui, sans-serif;
-      padding-bottom: calc(64px + env(safe-area-inset-bottom))
-    }
-
-    header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: calc(12px + env(safe-area-inset-top)) 16px 8px;
-      position: sticky;
-      top: 0;
-      background: var(--bg);
-      z-index: 5
-    }
-
-    h1 {
-      margin: 0;
-      font-size: 20px
-    }
-
-    main {
-      padding: 0 16px 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px
-    }
-
-    nav {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      background: var(--card);
-      border-top: 1px solid var(--bd);
-      padding-bottom: env(safe-area-inset-bottom)
-    }
-
-    nav[hidden] {
-      display: none
-    }
-
-    nav button {
-      flex: 1;
-      border: 0;
-      background: none;
-      color: var(--sub);
-      padding: 14px 0;
-      font-size: 13px
-    }
-
-    nav button.on {
-      color: var(--pri);
-      font-weight: 600
-    }
-
-    button,
-    select,
-    input {
-      font: inherit;
-      color: var(--tx)
-    }
-
-    button {
-      padding: 10px 14px;
-      border: 1px solid var(--bd);
-      border-radius: 10px;
-      background: var(--card)
-    }
-
-    button.primary {
-      background: var(--pri);
-      border-color: var(--pri);
-      color: #fff
-    }
-
-    button.danger {
-      color: var(--dng)
-    }
-
+    :root{--bg:#f3f4f6;--card:#fff;--tx:#111827;--sub:#6b7280;--pri:#2563eb;--bd:#e5e7eb;--dng:#dc2626}
+    @media(prefers-color-scheme:dark){:root{--bg:#111827;--card:#1f2937;--tx:#f9fafb;--sub:#9ca3af;--bd:#374151}}
+    *{box-sizing:border-box}
+    html{-webkit-text-size-adjust:100%}
+    body{margin:0;background:var(--bg);color:var(--tx);font:16px system-ui,sans-serif;padding-bottom:calc(64px + env(safe-area-inset-bottom))}
+    header{display:flex;align-items:center;gap:10px;padding:calc(12px + env(safe-area-inset-top)) 16px 8px;position:sticky;top:0;background:var(--bg);z-index:5}
+    h1{margin:0;font-size:20px}
+    main{padding:0 16px 16px;display:flex;flex-direction:column;gap:10px}
+    nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--bd);padding-bottom:env(safe-area-inset-bottom)}
+    nav[hidden]{display:none}
+    nav button{flex:1;border:0;background:none;color:var(--sub);padding:14px 0;font-size:13px}
+    nav button.on{color:var(--pri);font-weight:600}
+    button,select,input{font:inherit;color:var(--tx)}
+    button{padding:10px 14px;border:1px solid var(--bd);border-radius:10px;background:var(--card)}
+    button.primary{background:var(--pri);border-color:var(--pri);color:#fff}
+    button.danger{color:var(--dng)}
     /* 16px minimum on fields: smaller sizes make Safari zoom in on focus */
-    input,
-    select {
-      width: 100%;
-      padding: 10px;
-      border: 1px solid var(--bd);
-      border-radius: 10px;
-      background: var(--card);
-      font-size: 16px
-    }
-
-    input[type=checkbox] {
-      width: auto
-    }
-
-    label {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      font-size: 13px;
-      color: var(--sub)
-    }
-
-    label.chkrow {
-      flex-direction: row;
-      align-items: center;
-      gap: 8px;
-      font-size: 16px;
-      color: var(--tx)
-    }
-
-    .card,
-    .box {
-      background: var(--card);
-      border: 1px solid var(--bd);
-      border-radius: 12px;
-      padding: 10px;
-      display: flex;
-      gap: 10px;
-      align-items: center
-    }
-
-    .box {
-      flex-direction: column;
-      align-items: stretch
-    }
-
-    .col {
-      display: flex;
-      flex-direction: column;
-      gap: 10px
-    }
-
-    .row {
-      display: flex;
-      gap: 8px;
-      align-items: center
-    }
-
-    .sp {
-      flex: 1
-    }
-
-    .sub,
-    .hint,
-    .empty {
-      color: var(--sub);
-      font-size: 13px
-    }
-
-    .grp {
-      margin-top: 6px
-    }
-
-    .av {
-      width: 48px;
-      height: 48px;
-      border-radius: 50%;
-      object-fit: cover;
-      flex: none
-    }
-
-    .ph {
-      background: var(--pri);
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700
-    }
-
-    .tag {
-      display: inline-block;
-      background: var(--bg);
-      border-radius: 8px;
-      padding: 2px 8px;
-      font-size: 12px;
-      margin: 2px 4px 0 0
-    }
-
-    .tag.dp {
-      background: color-mix(in srgb, var(--pri) 18%, var(--bg))
-    }
-
-    .card.on {
-      border-color: var(--pri);
-      background: color-mix(in srgb, var(--pri) 12%, var(--card))
-    }
-
-    .chk {
-      font-size: 22px;
-      color: var(--pri)
-    }
-
-    .big {
-      font-size: 32px;
-      font-weight: 700;
-      text-align: center
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px
-    }
-
-    .chips button {
-      padding: 6px 10px;
-      font-size: 13px
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 8px
-    }
-
-    .stats .box {
-      align-items: center;
-      text-align: center
-    }
-
-    .stats b {
-      font-size: 22px
-    }
-
-    .bar {
-      position: relative;
-      background: var(--bg);
-      border-radius: 8px;
-      height: 26px;
-      overflow: hidden
-    }
-
-    .bar span {
-      position: absolute;
-      inset: 0 auto 0 0;
-      background: var(--pri);
-      opacity: .35
-    }
-
-    .bar em {
-      position: relative;
-      font-style: normal;
-      font-size: 13px;
-      line-height: 26px;
-      padding-left: 8px
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px
-    }
-
-    th,
-    td {
-      text-align: left;
-      padding: 6px 4px;
-      border-bottom: 1px solid var(--bd)
-    }
-
-    .scroll {
-      overflow-x: auto
-    }
-
-    dialog {
-      width: min(92vw, 420px);
-      border: 0;
-      border-radius: 16px;
-      background: var(--bg);
-      color: var(--tx);
-      padding: 16px
-    }
-
-    dialog::backdrop {
-      background: rgba(0, 0, 0, .5)
-    }
-
-    dialog form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px
-    }
+    input,select{width:100%;padding:10px;border:1px solid var(--bd);border-radius:10px;background:var(--card);font-size:16px}
+    input[type=checkbox]{width:auto}
+    label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
+    label.chkrow{flex-direction:row;align-items:center;gap:8px;font-size:16px;color:var(--tx)}
+    .card,.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
+    .box{flex-direction:column;align-items:stretch}
+    .col{display:flex;flex-direction:column;gap:10px}
+    .row{display:flex;gap:8px;align-items:center}
+    .sp{flex:1}
+    .sub,.hint,.empty{color:var(--sub);font-size:13px}
+    .grp{margin-top:6px}
+    .av{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}
+    .ph{background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+    .tag{display:inline-block;background:var(--bg);border-radius:8px;padding:2px 8px;font-size:12px;margin:2px 4px 0 0}
+    .tag.dp{background:color-mix(in srgb,var(--pri) 18%,var(--bg))}
+    .card.on{border-color:var(--pri);background:color-mix(in srgb,var(--pri) 12%,var(--card))}
+    .chk{font-size:22px;color:var(--pri)}
+    .big{font-size:32px;font-weight:700;text-align:center}
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chips button{padding:6px 10px;font-size:13px}
+    .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .stats .box{align-items:center;text-align:center}
+    .stats b{font-size:22px}
+    .bar{position:relative;background:var(--bg);border-radius:8px;height:26px;overflow:hidden}
+    .bar span{position:absolute;inset:0 auto 0 0;background:var(--pri);opacity:.35}
+    .bar em{position:relative;font-style:normal;font-size:13px;line-height:26px;padding-left:8px}
+    table{width:100%;border-collapse:collapse;font-size:14px}
+    th,td{text-align:left;padding:6px 4px;border-bottom:1px solid var(--bd)}
+    .scroll{overflow-x:auto}
+    dialog{width:min(92vw,420px);border:0;border-radius:16px;background:var(--bg);color:var(--tx);padding:16px}
+    dialog::backdrop{background:rgba(0,0,0,.5)}
+    dialog form{display:flex;flex-direction:column;gap:10px}
   </style>
 </head>
 
@@ -395,7 +125,7 @@
           t.onerror = () => rej(t.error);
         });
       };
-      return {get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k))};
+      return { get: k => tx('readonly', s => s.get(k)), set: (k, v) => tx('readwrite', s => s.put(v, k)) };
     })();
 
     /* ========== State ========== */
@@ -405,23 +135,25 @@
     // events:       [{id, instId, deptId, name, repeat, start}]   deptId '' = whole institution
     //               repeat: none | daily | weekly | biweekly | monthly
     // sessions:     [{id, eventId, date, present:[personId]}]     one session = one roll call on one date
-    let state = {institutions: [], people: [], events: [], sessions: []};
-    const ui = {instId: null, tab: 'people', q: '', dq: '', eventId: null, sessionId: null, an: {}};
+    let state = { institutions: [], people: [], events: [], sessions: [] };
+    const ui = { instId: null, tab: 'people', q: '', dq: '', eventId: null, sessionId: null, an: {} };
     let photoTmp = '';
 
-    const REPEAT = {none: 'Não repete', daily: 'Todo dia', weekly: 'Toda semana', biweekly: 'A cada 2 semanas', monthly: 'Todo mês'};
+    const REPEAT = { none: 'Não repete', daily: 'Todo dia', weekly: 'Toda semana', biweekly: 'A cada 2 semanas', monthly: 'Todo mês' };
 
     const save = () => DB.set('state', state);
-    const commit = () => {save(); render();};
+    const commit = () => { save(); render(); };
 
     /* ========== Utils ========== */
     const $ = s => document.querySelector(s);
     const uid = () => Math.random().toString(36).slice(2, 8) + Date.now().toString(36);
-    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const today = () => new Date(Date.now() - new Date().getTimezoneOffset() * 6e4).toISOString().slice(0, 10);
     const fmtDate = iso => (iso ? iso.split('-').reverse().join('/') : '');
-    const move = (arr, i, d) => {const j = i + d; if (j >= 0 && j < arr.length) [arr[i], arr[j]] = [arr[j], arr[i]];};
+    const move = (arr, i, d) => { const j = i + d; if (j >= 0 && j < arr.length) [arr[i], arr[j]] = [arr[j], arr[i]]; };
     const ask = (msg, def = '') => (prompt(msg, def) || '').trim();
+    // Lowercase ASCII file name part: "Culto de Domingo" -> "culto-de-domingo"
+    const slug = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'chamada';
 
     const age = birth => {
       if (!birth) return '';
@@ -461,6 +193,15 @@
       img.src = URL.createObjectURL(file);
     });
 
+    // Triggers a browser download for a blob
+    const saveBlob = (blob, name) => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    };
+
     /* ========== Scoped selectors (current institution / event / session) ========== */
     const inst = () => state.institutions.find(i => i.id === ui.instId);
     const instPeople = () => state.people.filter(p => p.instId === ui.instId);
@@ -478,7 +219,7 @@
     // Every date of the event from its start until today
     const occurrences = ev => {
       if (ev.repeat === 'none') return [ev.start];
-      const step = {daily: 1, weekly: 7, biweekly: 14}[ev.repeat];
+      const step = { daily: 1, weekly: 7, biweekly: 14 }[ev.repeat];
       const out = [];
       for (let i = 0; out.length < 1000; i++) {
         const d = ev.repeat === 'monthly' ? addMonths(ev.start, i) : addDays(ev.start, i * step);
@@ -495,7 +236,7 @@
     // Opens the roll call of that date, creating it if needed
     const createSession = (eventId, date) => {
       let s = state.sessions.find(x => x.eventId === eventId && x.date === date);
-      if (!s) {s = {id: uid(), eventId, date, present: []}; state.sessions.push(s);}
+      if (!s) { s = { id: uid(), eventId, date, present: [] }; state.sessions.push(s); }
       ui.sessionId = s.id;
       ui.q = '';
       commit();
@@ -528,72 +269,72 @@
     const deptTags = p => p.depts.map(deptName).filter(Boolean).map(n => `<span class="tag dp">${esc(n)}</span>`).join('');
 
     const matchQ = p => (!ui.dq || p.depts.includes(ui.dq)) && (!ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase()));
-    const openDlg = html => {$('#dlg').innerHTML = html; $('#dlg').showModal();};
+    const openDlg = html => { $('#dlg').innerHTML = html; $('#dlg').showModal(); };
     const dlgButtons = (extra = '') => `
-  <div class="row">
-    <button type="button" data-act="closeDlg">Cancelar</button>${extra}
-    <span class="sp"></span><button class="primary">Salvar</button>
-  </div>`;
+      <div class="row">
+        <button type="button" data-act="closeDlg">Cancelar</button>${extra}
+        <span class="sp"></span><button class="primary">Salvar</button>
+      </div>`;
     const selectOpt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
 
     /* ========== View: Institutions (home) ========== */
     const homeView = () => `
-  <button class="primary" data-act="addInst">+ Nova instituição</button>
-  ${state.institutions.map(i => `
-  <div class="card" data-act="openInst" data-id="${i.id}">
-    <div>
-      <b>${esc(i.name)}</b>
-      <div class="sub">${state.people.filter(p => p.instId === i.id).length} pessoas · ${i.depts.length} departamentos · ${state.events.filter(e => e.instId === i.id).length} eventos</div>
-    </div>
-    <span class="sp"></span>
-    <button data-act="renInst" data-id="${i.id}">✎</button>
-    <button class="danger" data-act="delInst" data-id="${i.id}">🗑</button>
-  </div>`).join('') || '<p class="empty">Crie sua primeira instituição.</p>'}
-  ${backupView()}`;
+      <button class="primary" data-act="addInst">+ Nova instituição</button>
+      ${state.institutions.map(i => `
+      <div class="card" data-act="openInst" data-id="${i.id}">
+        <div>
+          <b>${esc(i.name)}</b>
+          <div class="sub">${state.people.filter(p => p.instId === i.id).length} pessoas · ${i.depts.length} departamentos · ${state.events.filter(e => e.instId === i.id).length} eventos</div>
+        </div>
+        <span class="sp"></span>
+        <button data-act="renInst" data-id="${i.id}">✎</button>
+        <button class="danger" data-act="delInst" data-id="${i.id}">🗑</button>
+      </div>`).join('') || '<p class="empty">Crie sua primeira instituição.</p>'}
+      ${backupView()}`;
 
     /* ========== View: People ========== */
     const peopleList = () => sortPeople(instPeople()).filter(matchQ).map(p => `
-  <div class="card" data-act="editPerson" data-id="${p.id}">
-    ${avatar(p)}
-    <div>
-      <b>${esc(p.name)}</b>
-      <div class="sub">${esc(p.phone)}${p.birth ? ` · ${fmtDate(p.birth)} (${age(p.birth)} anos)` : ''}</div>
-      <div>${badges(p)}${deptTags(p)}</div>
-    </div>
-  </div>`).join('') || '<p class="empty">Nenhuma pessoa.</p>';
+      <div class="card" data-act="editPerson" data-id="${p.id}">
+        ${avatar(p)}
+        <div>
+          <b>${esc(p.name)}</b>
+          <div class="sub">${esc(p.phone)}${p.birth ? ` · ${fmtDate(p.birth)} (${age(p.birth)} anos)` : ''}</div>
+          <div>${badges(p)}${deptTags(p)}</div>
+        </div>
+      </div>`).join('') || '<p class="empty">Nenhuma pessoa.</p>';
 
     const peopleView = () => `
-  <button class="primary" data-act="newPerson">+ Nova pessoa</button>
-  <input id="q" placeholder="Buscar nome ou telefone…" value="${esc(ui.q)}">
-  ${inst().depts.length ? `<select id="deptF">${selectOpt('', 'Todos os departamentos', ui.dq)}${inst().depts.map(d => selectOpt(d.id, d.name, ui.dq)).join('')}</select>` : ''}
-  <div id="list" class="col">${peopleList()}</div>`;
+      <button class="primary" data-act="newPerson">+ Nova pessoa</button>
+      <input id="q" placeholder="Buscar nome ou telefone…" value="${esc(ui.q)}">
+      ${inst().depts.length ? `<select id="deptF">${selectOpt('', 'Todos os departamentos', ui.dq)}${inst().depts.map(d => selectOpt(d.id, d.name, ui.dq)).join('')}</select>` : ''}
+      <div id="list" class="col">${peopleList()}</div>`;
 
     const personDialog = id => {
-      const p = state.people.find(x => x.id === id) || {id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: []};
+      const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: [] };
       photoTmp = p.photo;
       openDlg(`
-  <form id="personForm" data-id="${p.id}">
-    <div class="row">
-      <img id="pv" class="av" src="${p.photo}" ${p.photo ? '' : 'hidden'} alt="">
-      <input type="file" id="photoIn" accept="image/*">
-    </div>
-    <label>Nome<input name="name" required value="${esc(p.name)}"></label>
-    <label>Telefone<input name="phone" type="tel" value="${esc(p.phone)}"></label>
-    <label>Data de nascimento<input name="birth" type="date" value="${esc(p.birth)}"></label>
-    ${inst().traits.map(t => `
-      <label>${esc(t.name)}
-        <select name="t_${t.id}">
-          <option value="">—</option>
-          ${t.values.map(v => `<option value="${v.id}" ${p.traits[t.id] === v.id ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}
-        </select>
-      </label>`).join('')}
-    ${inst().depts.length ? `
-      <div class="col">
-        <span class="hint">Departamentos</span>
-        ${inst().depts.map(d => `<label class="chkrow"><input type="checkbox" name="d_${d.id}" ${p.depts.includes(d.id) ? 'checked' : ''}>${esc(d.name)}</label>`).join('')}
-      </div>` : ''}
-    ${dlgButtons(p.id ? `<button type="button" class="danger" data-act="delPerson" data-id="${p.id}">Excluir</button>` : '')}
-  </form>`);
+      <form id="personForm" data-id="${p.id}">
+        <div class="row">
+          <img id="pv" class="av" src="${p.photo}" ${p.photo ? '' : 'hidden'} alt="">
+          <input type="file" id="photoIn" accept="image/*">
+        </div>
+        <label>Nome<input name="name" required value="${esc(p.name)}"></label>
+        <label>Telefone<input name="phone" type="tel" value="${esc(p.phone)}"></label>
+        <label>Data de nascimento<input name="birth" type="date" value="${esc(p.birth)}"></label>
+        ${inst().traits.map(t => `
+          <label>${esc(t.name)}
+            <select name="t_${t.id}">
+              <option value="">—</option>
+              ${t.values.map(v => `<option value="${v.id}" ${p.traits[t.id] === v.id ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}
+            </select>
+          </label>`).join('')}
+        ${inst().depts.length ? `
+          <div class="col">
+            <span class="hint">Departamentos</span>
+            ${inst().depts.map(d => `<label class="chkrow"><input type="checkbox" name="d_${d.id}" ${p.depts.includes(d.id) ? 'checked' : ''}>${esc(d.name)}</label>`).join('')}
+          </div>` : ''}
+        ${dlgButtons(p.id ? `<button type="button" class="danger" data-act="delPerson" data-id="${p.id}">Excluir</button>` : '')}
+      </form>`);
     };
 
     const savePerson = (f, id) => {
@@ -602,64 +343,64 @@
         traits: {},
         depts: inst().depts.filter(d => f.get('d_' + d.id)).map(d => d.id)
       };
-      inst().traits.forEach(t => {const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v;});
+      inst().traits.forEach(t => { const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v; });
       if (id) Object.assign(state.people.find(p => p.id === id), data);
-      else state.people.push({id: uid(), instId: ui.instId, ...data});
+      else state.people.push({ id: uid(), instId: ui.instId, ...data });
       $('#dlg').close();
       commit();
     };
 
     /* ========== View: Traits ========== */
     const traitsView = () => `
-  <button class="primary" data-act="addTrait">+ Atributo</button>
-  <p class="hint">A ordem define a superioridade: o topo é o mais alto. Pessoas são ordenadas pelos atributos na ordem listada.</p>
-  ${inst().traits.map((t, ti) => `
-  <section class="box">
-    <div class="row">
-      <b>${esc(t.name)}</b><span class="sp"></span>
-      <button data-act="moveTrait" data-i="${ti}" data-d="-1">↑</button>
-      <button data-act="moveTrait" data-i="${ti}" data-d="1">↓</button>
-      <button data-act="renTrait" data-i="${ti}">✎</button>
-      <button class="danger" data-act="delTrait" data-i="${ti}">🗑</button>
-    </div>
-    ${t.values.map((v, vi) => `
-    <div class="row">
-      <span>${vi + 1}. ${esc(v.name)}</span><span class="sp"></span>
-      <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="-1">↑</button>
-      <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="1">↓</button>
-      <button data-act="renVal" data-i="${ti}" data-j="${vi}">✎</button>
-      <button class="danger" data-act="delVal" data-i="${ti}" data-j="${vi}">🗑</button>
-    </div>`).join('')}
-    <button data-act="addValue" data-i="${ti}">+ Valor</button>
-  </section>`).join('')}`;
+      <button class="primary" data-act="addTrait">+ Atributo</button>
+      <p class="hint">A ordem define a superioridade: o topo é o mais alto. Pessoas são ordenadas pelos atributos na ordem listada.</p>
+      ${inst().traits.map((t, ti) => `
+      <section class="box">
+        <div class="row">
+          <b>${esc(t.name)}</b><span class="sp"></span>
+          <button data-act="moveTrait" data-i="${ti}" data-d="-1">↑</button>
+          <button data-act="moveTrait" data-i="${ti}" data-d="1">↓</button>
+          <button data-act="renTrait" data-i="${ti}">✎</button>
+          <button class="danger" data-act="delTrait" data-i="${ti}">🗑</button>
+        </div>
+        ${t.values.map((v, vi) => `
+        <div class="row">
+          <span>${vi + 1}. ${esc(v.name)}</span><span class="sp"></span>
+          <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="-1">↑</button>
+          <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="1">↓</button>
+          <button data-act="renVal" data-i="${ti}" data-j="${vi}">✎</button>
+          <button class="danger" data-act="delVal" data-i="${ti}" data-j="${vi}">🗑</button>
+        </div>`).join('')}
+        <button data-act="addValue" data-i="${ti}">+ Valor</button>
+      </section>`).join('')}`;
 
     /* ========== View: Departments ========== */
     const deptsView = () => `
-  <button class="primary" data-act="addDept">+ Departamento</button>
-  <p class="hint">Toque em um departamento para ver seus membros. Atribua pessoas a ele no cadastro delas.</p>
-  ${inst().depts.map(d => `
-  <div class="card" data-act="deptPeople" data-id="${d.id}">
-    <div>
-      <b>${esc(d.name)}</b>
-      <div class="sub">${instPeople().filter(p => p.depts.includes(d.id)).length} membros · ${instEvents().filter(e => e.deptId === d.id).length} eventos</div>
-    </div>
-    <span class="sp"></span>
-    <button data-act="renDept" data-id="${d.id}">✎</button>
-    <button class="danger" data-act="delDept" data-id="${d.id}">🗑</button>
-  </div>`).join('') || '<p class="empty">Nenhum departamento.</p>'}`;
+      <button class="primary" data-act="addDept">+ Departamento</button>
+      <p class="hint">Toque em um departamento para ver seus membros. Atribua pessoas a ele no cadastro delas.</p>
+      ${inst().depts.map(d => `
+      <div class="card" data-act="deptPeople" data-id="${d.id}">
+        <div>
+          <b>${esc(d.name)}</b>
+          <div class="sub">${instPeople().filter(p => p.depts.includes(d.id)).length} membros · ${instEvents().filter(e => e.deptId === d.id).length} eventos</div>
+        </div>
+        <span class="sp"></span>
+        <button data-act="renDept" data-id="${d.id}">✎</button>
+        <button class="danger" data-act="delDept" data-id="${d.id}">🗑</button>
+      </div>`).join('') || '<p class="empty">Nenhum departamento.</p>'}`;
 
     /* ========== View: Events ========== */
     const lastDate = ev => eventSessions(ev.id).map(s => s.date).sort().pop() || '';
 
     const eventsView = () => {
-      const groups = [{id: '', name: 'Toda a instituição'}, ...inst().depts];
+      const groups = [{ id: '', name: 'Toda a instituição' }, ...inst().depts];
       const card = ev => `
-  <div class="card" data-act="openEvent" data-id="${ev.id}">
-    <div>
-      <b>${esc(ev.name)}</b>
-      <div class="sub">${REPEAT[ev.repeat]} · ${eventSessions(ev.id).length} chamadas${lastDate(ev) ? ` · última ${fmtDate(lastDate(ev))}` : ''}</div>
-    </div>
-  </div>`;
+      <div class="card" data-act="openEvent" data-id="${ev.id}">
+        <div>
+          <b>${esc(ev.name)}</b>
+          <div class="sub">${REPEAT[ev.repeat]} · ${eventSessions(ev.id).length} chamadas${lastDate(ev) ? ` · última ${fmtDate(lastDate(ev))}` : ''}</div>
+        </div>
+      </div>`;
       const body = groups.map(g => {
         const list = instEvents().filter(e => e.deptId === g.id);
         return list.length ? `<b class="grp">${esc(g.name)}</b>${list.map(card).join('')}` : '';
@@ -671,49 +412,49 @@
       const ev = curEvent();
       const pend = pendingDates(ev);
       return `
-  <div class="row">
-    <button data-act="backEvents">←</button>
-    <b>${esc(ev.name)}</b><span class="sp"></span>
-    <button data-act="editEvent" data-id="${ev.id}">✎</button>
-  </div>
-  <p class="hint">${ev.deptId ? `${esc(deptName(ev.deptId))} · ` : ''}${REPEAT[ev.repeat]} · desde ${fmtDate(ev.start)}</p>
-  <section class="box">
-    <b>${ev.repeat === 'none' ? 'Data do evento' : 'Datas sem chamada'}</b>
-    <div class="chips">
-      ${pend.map(d => `<button data-act="pickDate" data-date="${d}">${fmtDate(d)}</button>`).join('') || '<span class="empty">Nenhuma pendente.</span>'}
-      <button class="primary" data-act="otherDate">+ Outra data</button>
-    </div>
-  </section>
-  ${[...eventSessions(ev.id)].sort((a, b) => b.date.localeCompare(a.date)).map(s => `
-  <div class="card" data-act="openSession" data-id="${s.id}">
-    <b>${fmtDate(s.date)}</b><span class="sp"></span><b>${s.present.length} presentes</b>
-  </div>`).join('') || '<p class="empty">Nenhuma chamada feita.</p>'}`;
+      <div class="row">
+        <button data-act="backEvents">←</button>
+        <b>${esc(ev.name)}</b><span class="sp"></span>
+        <button data-act="editEvent" data-id="${ev.id}">✎</button>
+      </div>
+      <p class="hint">${ev.deptId ? `${esc(deptName(ev.deptId))} · ` : ''}${REPEAT[ev.repeat]} · desde ${fmtDate(ev.start)}</p>
+      <section class="box">
+        <b>${ev.repeat === 'none' ? 'Data do evento' : 'Datas sem chamada'}</b>
+        <div class="chips">
+          ${pend.map(d => `<button data-act="pickDate" data-date="${d}">${fmtDate(d)}</button>`).join('') || '<span class="empty">Nenhuma pendente.</span>'}
+          <button class="primary" data-act="otherDate">+ Outra data</button>
+        </div>
+      </section>
+      ${[...eventSessions(ev.id)].sort((a, b) => b.date.localeCompare(a.date)).map(s => `
+      <div class="card" data-act="openSession" data-id="${s.id}">
+        <b>${fmtDate(s.date)}</b><span class="sp"></span><b>${s.present.length} presentes</b>
+      </div>`).join('') || '<p class="empty">Nenhuma chamada feita.</p>'}`;
     };
 
     const eventDialog = id => {
-      const ev = state.events.find(x => x.id === id) || {id: '', name: '', deptId: '', repeat: 'weekly', start: today()};
+      const ev = state.events.find(x => x.id === id) || { id: '', name: '', deptId: '', repeat: 'weekly', start: today() };
       openDlg(`
-  <form id="eventForm" data-id="${ev.id}">
-    <label>Nome<input name="name" required placeholder="Ex.: Culto de domingo" value="${esc(ev.name)}"></label>
-    <label>Pertence a
-      <select name="deptId">
-        ${selectOpt('', 'Toda a instituição', ev.deptId)}
-        ${inst().depts.map(d => selectOpt(d.id, d.name, ev.deptId)).join('')}
-      </select>
-    </label>
-    <label>Repetição
-      <select name="repeat">${Object.entries(REPEAT).map(([k, l]) => selectOpt(k, l, ev.repeat)).join('')}</select>
-    </label>
-    <label>Primeira data<input name="start" type="date" required value="${ev.start}"></label>
-    ${dlgButtons(ev.id ? `<button type="button" class="danger" data-act="delEvent" data-id="${ev.id}">Excluir</button>` : '')}
-  </form>`);
+      <form id="eventForm" data-id="${ev.id}">
+        <label>Nome<input name="name" required placeholder="Ex.: Culto de domingo" value="${esc(ev.name)}"></label>
+        <label>Pertence a
+          <select name="deptId">
+            ${selectOpt('', 'Toda a instituição', ev.deptId)}
+            ${inst().depts.map(d => selectOpt(d.id, d.name, ev.deptId)).join('')}
+          </select>
+        </label>
+        <label>Repetição
+          <select name="repeat">${Object.entries(REPEAT).map(([k, l]) => selectOpt(k, l, ev.repeat)).join('')}</select>
+        </label>
+        <label>Primeira data<input name="start" type="date" required value="${ev.start}"></label>
+        ${dlgButtons(ev.id ? `<button type="button" class="danger" data-act="delEvent" data-id="${ev.id}">Excluir</button>` : '')}
+      </form>`);
     };
 
     const saveEvent = (f, id) => {
-      const data = {name: f.get('name').trim(), deptId: f.get('deptId'), repeat: f.get('repeat'), start: f.get('start')};
+      const data = { name: f.get('name').trim(), deptId: f.get('deptId'), repeat: f.get('repeat'), start: f.get('start') };
       if (id) Object.assign(state.events.find(e => e.id === id), data);
       else {
-        const ev = {id: uid(), instId: ui.instId, ...data};
+        const ev = { id: uid(), instId: ui.instId, ...data };
         state.events.push(ev);
         ui.eventId = ev.id;
       }
@@ -722,10 +463,10 @@
     };
 
     const dateDialog = () => openDlg(`
-  <form id="dateForm">
-    <label>Data da chamada<input name="date" type="date" required value="${today()}"></label>
-    ${dlgButtons()}
-  </form>`);
+      <form id="dateForm">
+        <label>Data da chamada<input name="date" type="date" required value="${today()}"></label>
+        ${dlgButtons()}
+      </form>`);
 
     /* ========== View: Roll call ========== */
     const rollList = () => {
@@ -733,25 +474,146 @@
       return sortPeople(eventPeople(curEvent())).filter(matchQ).map(p => {
         const on = s.present.includes(p.id);
         return `<div class="card ${on ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
-      ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p)}</div></div>
-      <span class="sp"></span><span class="chk">${on ? '✔' : ''}</span></div>`;
+          ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p)}</div></div>
+          <span class="sp"></span><span class="chk">${on ? '✔' : ''}</span></div>`;
       }).join('') || '<p class="empty">Nenhuma pessoa.</p>';
     };
 
     const rollCall = () => {
       const s = curSession(), ev = curEvent();
       return `
-  <div class="row">
-    <button data-act="backEvent">←</button>
-    <b>${esc(ev.name)} · ${fmtDate(s.date)}</b><span class="sp"></span>
-    <button class="danger" data-act="delSession">🗑</button>
-  </div>
-  <div class="big" id="cnt">${s.present.length} / ${eventPeople(ev).length}</div>
-  <input id="q" placeholder="Buscar…" value="${esc(ui.q)}">
-  <div id="list" class="col">${rollList()}</div>`;
+      <div class="row">
+        <button data-act="backEvent">←</button>
+        <b>${esc(ev.name)} · ${fmtDate(s.date)}</b><span class="sp"></span>
+        <button data-act="pdf">PDF</button>
+        <button class="danger" data-act="delSession">🗑</button>
+      </div>
+      <div class="big" id="cnt">${s.present.length} / ${eventPeople(ev).length}</div>
+      <input id="q" placeholder="Buscar…" value="${esc(ui.q)}">
+      <div id="list" class="col">${rollList()}</div>`;
     };
 
     const attView = () => ui.sessionId ? rollCall() : ui.eventId ? eventView() : eventsView();
+
+    /* ========== PDF: attendance report ========== */
+    // Plain-text version of a person's traits (e.g. "Cargo: Pastor · Ministério: Louvor")
+    const traitsText = p => inst().traits
+      .map(t => { const v = t.values.find(v => v.id === p.traits[t.id]); return v ? `${t.name}: ${v.name}` : ''; })
+      .filter(Boolean).join(' · ');
+
+    // Draws the report on A4 canvases (1240x1754 = 150 dpi); a new page starts when one fills up
+    const drawPdfPages = ({ title, subtitle, summary, sections }) => {
+      const W = 1240, H = 1754, M = 90, ROW = 46;
+      const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+      const pages = [];
+      let g, y;
+
+      const newPage = () => {
+        const c = document.createElement('canvas');
+        c.width = W; c.height = H;
+        g = c.getContext('2d');
+        g.fillStyle = '#fff';
+        g.fillRect(0, 0, W, H);
+        g.textBaseline = 'top';
+        y = M;
+        pages.push(c);
+      };
+      const need = h => { if (y + h > H - M) newPage(); };
+      // Draws one line of text at the current y, cutting it with an ellipsis if it overflows maxW
+      const text = (str, x, size, { bold = false, color = '#111827', maxW = W - M - x } = {}) => {
+        g.font = `${bold ? '700 ' : ''}${size}px ${FONT}`;
+        g.fillStyle = color;
+        let out = str;
+        if (g.measureText(str).width > maxW) {
+          while (out.length > 1 && g.measureText(out + '…').width > maxW) out = out.slice(0, -1);
+          out = out.trimEnd() + '…';
+        }
+        g.fillText(out, x, y);
+      };
+
+      newPage();
+      text(title, M, 46, { bold: true }); y += 66;
+      if (subtitle) { text(subtitle, M, 28, { color: '#6b7280' }); y += 46; }
+      text(summary, M, 32, { bold: true, color: '#2563eb' }); y += 70;
+
+      sections.forEach(({ label, list }) => {
+        need(130);
+        text(`${label} (${list.length})`, M, 34, { bold: true }); y += 58;
+        if (!list.length) { text('Ninguém.', M, 26, { color: '#6b7280' }); y += ROW; }
+        list.forEach((p, i) => {
+          need(ROW);
+          text(`${i + 1}. ${p.name}`, M, 28, { maxW: 520 });
+          text(traitsText(p), M + 560, 22, { color: '#6b7280', maxW: W - M - (M + 560) });
+          g.fillStyle = '#e5e7eb';
+          g.fillRect(M, y + ROW - 8, W - 2 * M, 2);
+          y += ROW;
+        });
+        y += 30;
+      });
+
+      pages.forEach((c, i) => {
+        const f = c.getContext('2d');
+        f.font = `20px ${FONT}`;
+        f.fillStyle = '#6b7280';
+        f.textBaseline = 'top';
+        f.fillText(`MEMBERS · ${fmtDate(today())} · página ${i + 1}/${pages.length}`, M, H - 60);
+      });
+      return pages;
+    };
+
+    // Minimal PDF writer: one full-page JPEG per A4 page, no external library
+    const makePdf = canvases => {
+      const enc = new TextEncoder(), chunks = [], xref = [];
+      let size = 0;
+      const put = d => { const b = typeof d === 'string' ? enc.encode(d) : d; chunks.push(b); size += b.length; };
+      const begin = n => { xref[n] = size; put(`${n} 0 obj\n`); };
+      const jpeg = c => Uint8Array.from(atob(c.toDataURL('image/jpeg', 0.85).split(',')[1]), ch => ch.charCodeAt(0));
+      const PW = 595, PH = 842; // A4 in points
+      const total = 3 + canvases.length * 3;
+
+      put('%PDF-1.4\n');
+      begin(1); put('<< /Type /Catalog /Pages 2 0 R >>\nendobj\n');
+      begin(2); put(`<< /Type /Pages /Kids [${canvases.map((_, i) => `${3 + i * 3} 0 R`).join(' ')}] /Count ${canvases.length} >>\nendobj\n`);
+      canvases.forEach((c, i) => {
+        const page = 3 + i * 3, content = page + 1, image = page + 2, data = jpeg(c);
+        const draw = `q ${PW} 0 0 ${PH} 0 0 cm /Im Do Q`;
+        begin(page); put(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW} ${PH}] /Resources << /XObject << /Im ${image} 0 R >> >> /Contents ${content} 0 R >>\nendobj\n`);
+        begin(content); put(`<< /Length ${draw.length} >>\nstream\n${draw}\nendstream\nendobj\n`);
+        begin(image); put(`<< /Type /XObject /Subtype /Image /Width ${c.width} /Height ${c.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${data.length} >>\nstream\n`);
+        put(data); put('\nendstream\nendobj\n');
+      });
+      const xrefPos = size;
+      put(`xref\n0 ${total}\n0000000000 65535 f \n`);
+      for (let n = 1; n < total; n++) put(`${String(xref[n]).padStart(10, '0')} 00000 n \n`);
+      put(`trailer\n<< /Size ${total} /Root 1 0 R >>\nstartxref\n${xrefPos}\n%%EOF`);
+      return new Blob(chunks, { type: 'application/pdf' });
+    };
+
+    // Builds the PDF of the open roll call and shares it (native share sheet, or download as fallback)
+    const sharePdf = async () => {
+      const s = curSession(), ev = curEvent();
+      const people = sortPeople(eventPeople(ev));
+      const present = people.filter(p => s.present.includes(p.id));
+      const absent = people.filter(p => !s.present.includes(p.id));
+      const pct = people.length ? Math.round(present.length / people.length * 100) : 0;
+      const title = `${ev.name} · ${fmtDate(s.date)}`;
+
+      const pages = drawPdfPages({
+        title,
+        subtitle: [inst().name, ev.deptId && deptName(ev.deptId)].filter(Boolean).join(' · '),
+        summary: `Presentes: ${present.length} de ${people.length} (${pct}%)`,
+        sections: [{ label: 'Presentes', list: present }, { label: 'Ausentes', list: absent }]
+      });
+      const name = `${slug(ev.name)}-${s.date}.pdf`;
+      const blob = makePdf(pages);
+      const file = new File([blob], name, { type: 'application/pdf' });
+
+      if (navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file], title }); return; }
+        catch (e) { if (e.name === 'AbortError') return; }
+      }
+      saveBlob(blob, name);
+    };
 
     /* ========== View: Stats ========== */
     const statsView = () => {
@@ -771,7 +633,7 @@
       // Each session is measured against the people expected at its event
       const perSession = sessions.map(s => {
         const elig = people.filter(p => inEvent(p, evOf(s)));
-        return {s, c: elig.filter(p => s.present.includes(p.id)).length, tot: elig.length};
+        return { s, c: elig.filter(p => s.present.includes(p.id)).length, tot: elig.length };
       });
       const avg = n ? perSession.reduce((sum, x) => sum + x.c, 0) / n : 0;
       const rate = n ? Math.round(perSession.reduce((sum, x) => sum + (x.tot ? x.c / x.tot : 0), 0) / n * 100) : 0;
@@ -779,7 +641,7 @@
       const rows = people.map(p => {
         const el = sessions.filter(s => inEvent(p, evOf(s)));
         const hits = el.filter(s => s.present.includes(p.id));
-        return {p, c: hits.length, tot: el.length, pct: el.length ? hits.length / el.length * 100 : 0, last: hits.length ? hits[hits.length - 1].date : ''};
+        return { p, c: hits.length, tot: el.length, pct: el.length ? hits.length / el.length * 100 : 0, last: hits.length ? hits[hits.length - 1].date : '' };
       }).sort((x, y) => y.pct - x.pct || x.p.name.localeCompare(y.p.name));
 
       const last3 = sessions.slice(-3);
@@ -790,82 +652,78 @@
 
       const evName = id => evs.find(e => e.id === id)?.name || '';
       return `
-  <section class="box">
-    ${depts.length ? `<select data-f="deptId">${selectOpt('', 'Todos os departamentos', a.deptId)}${depts.map(d => selectOpt(d.id, d.name, a.deptId)).join('')}</select>` : ''}
-    <select data-f="eventId">${selectOpt('', 'Todos os eventos', a.eventId)}${evOptions.map(e => selectOpt(e.id, e.name, a.eventId)).join('')}</select>
-    <div class="row">
-      <select data-f="traitId">${selectOpt('', 'Todos', a.traitId)}${traits.map(x => selectOpt(x.id, x.name, a.traitId)).join('')}</select>
-      ${t ? `<select data-f="valueId">${selectOpt('', 'Todos', a.valueId)}${t.values.map(v => selectOpt(v.id, v.name, a.valueId)).join('')}</select>` : ''}
-    </div>
-    <div class="row">
-      <input type="date" data-f="from" value="${a.from}"><input type="date" data-f="to" value="${a.to}">
-    </div>
-  </section>
-  <div class="stats">
-    <div class="box"><b>${n}</b><span class="sub">chamadas</span></div>
-    <div class="box"><b>${avg.toFixed(1)}</b><span class="sub">média presentes</span></div>
-    <div class="box"><b>${rate}%</b><span class="sub">taxa média</span></div>
-  </div>
-  <section class="box">
-    <b>Por chamada</b>
-    ${perSession.map(x => `<div class="bar"><span style="width:${x.tot ? x.c / x.tot * 100 : 0}%"></span><em>${fmtDate(x.s.date)}${a.eventId ? '' : ` · ${esc(evName(x.s.eventId))}`} · ${x.c}</em></div>`).join('') || '<p class="empty">Sem dados.</p>'}
-  </section>
-  <section class="box">
-    <b>Ranking de presença</b>
-    <div class="scroll"><table>
-      <tr><th>Nome</th><th>Pres.</th><th>%</th><th>Última</th></tr>
-      ${rows.map(r => `<tr><td>${esc(r.p.name)}</td><td>${r.c}/${r.tot}</td><td>${Math.round(r.pct)}%</td><td>${fmtDate(r.last) || '—'}</td></tr>`).join('')}
-    </table></div>
-  </section>
-  ${n >= 3 ? `<section class="box"><b>Ausentes nas últimas 3 chamadas</b>${absent.map(p => `<div>${esc(p.name)}</div>`).join('') || '<p class="empty">Ninguém.</p>'}</section>` : ''}`;
+      <section class="box">
+        ${depts.length ? `<select data-f="deptId">${selectOpt('', 'Todos os departamentos', a.deptId)}${depts.map(d => selectOpt(d.id, d.name, a.deptId)).join('')}</select>` : ''}
+        <select data-f="eventId">${selectOpt('', 'Todos os eventos', a.eventId)}${evOptions.map(e => selectOpt(e.id, e.name, a.eventId)).join('')}</select>
+        <div class="row">
+          <select data-f="traitId">${selectOpt('', 'Todos', a.traitId)}${traits.map(x => selectOpt(x.id, x.name, a.traitId)).join('')}</select>
+          ${t ? `<select data-f="valueId">${selectOpt('', 'Todos', a.valueId)}${t.values.map(v => selectOpt(v.id, v.name, a.valueId)).join('')}</select>` : ''}
+        </div>
+        <div class="row">
+          <input type="date" data-f="from" value="${a.from}"><input type="date" data-f="to" value="${a.to}">
+        </div>
+      </section>
+      <div class="stats">
+        <div class="box"><b>${n}</b><span class="sub">chamadas</span></div>
+        <div class="box"><b>${avg.toFixed(1)}</b><span class="sub">média presentes</span></div>
+        <div class="box"><b>${rate}%</b><span class="sub">taxa média</span></div>
+      </div>
+      <section class="box">
+        <b>Por chamada</b>
+        ${perSession.map(x => `<div class="bar"><span style="width:${x.tot ? x.c / x.tot * 100 : 0}%"></span><em>${fmtDate(x.s.date)}${a.eventId ? '' : ` · ${esc(evName(x.s.eventId))}`} · ${x.c}</em></div>`).join('') || '<p class="empty">Sem dados.</p>'}
+      </section>
+      <section class="box">
+        <b>Ranking de presença</b>
+        <div class="scroll"><table>
+          <tr><th>Nome</th><th>Pres.</th><th>%</th><th>Última</th></tr>
+          ${rows.map(r => `<tr><td>${esc(r.p.name)}</td><td>${r.c}/${r.tot}</td><td>${Math.round(r.pct)}%</td><td>${fmtDate(r.last) || '—'}</td></tr>`).join('')}
+        </table></div>
+      </section>
+      ${n >= 3 ? `<section class="box"><b>Ausentes nas últimas 3 chamadas</b>${absent.map(p => `<div>${esc(p.name)}</div>`).join('') || '<p class="empty">Ninguém.</p>'}</section>` : ''}`;
     };
 
     /* ========== Backup ========== */
     const backupView = () => `
-  <section class="box">
-    <b>Backup</b>
-    <p class="hint">${state.institutions.length} instituições · ${state.people.length} pessoas · ${state.events.length} eventos · ${state.sessions.length} chamadas</p>
-    <button class="primary" data-act="export">Exportar backup (.json)</button>
-    <label>Importar backup (substitui os dados atuais)<input type="file" id="importIn" accept="application/json,.json"></label>
-  </section>`;
+      <section class="box">
+        <b>Backup</b>
+        <p class="hint">${state.institutions.length} instituições · ${state.people.length} pessoas · ${state.events.length} eventos · ${state.sessions.length} chamadas</p>
+        <button class="primary" data-act="export">Exportar backup (.json)</button>
+        <label>Importar backup (substitui os dados atuais)<input type="file" id="importIn" accept="application/json,.json"></label>
+      </section>`;
 
     // Converts any saved/backup format into the current one
     // v1: no institutions or events | v2: no departments | v3: current
     const migrate = d => {
-      const people = (d.people || []).map(p => ({...p, traits: p.traits || {}, depts: p.depts || []}));
-      const sessions = (d.sessions || []).map(s => ({...s, present: s.present || []}));
-      const fixTraits = list => (list || []).map(t => ({...t, values: t.values || []}));
+      const people = (d.people || []).map(p => ({ ...p, traits: p.traits || {}, depts: p.depts || [] }));
+      const sessions = (d.sessions || []).map(s => ({ ...s, present: s.present || [] }));
+      const fixTraits = list => (list || []).map(t => ({ ...t, values: t.values || [] }));
 
       if (Array.isArray(d.institutions)) {
         return {
-          institutions: d.institutions.map(i => ({...i, traits: fixTraits(i.traits), depts: i.depts || []})),
+          institutions: d.institutions.map(i => ({ ...i, traits: fixTraits(i.traits), depts: i.depts || [] })),
           people,
-          events: (d.events || []).map(e => ({...e, deptId: e.deptId || ''})),
+          events: (d.events || []).map(e => ({ ...e, deptId: e.deptId || '' })),
           sessions
         };
       }
 
       // v1: everything goes into one institution; each distinct roll call name becomes an event
-      const institution = {id: uid(), name: 'Minha instituição', traits: fixTraits(d.traits), depts: []};
+      const institution = { id: uid(), name: 'Minha instituição', traits: fixTraits(d.traits), depts: [] };
       const events = [];
       sessions.forEach(s => {
         const name = s.name || 'Chamada';
         let ev = events.find(e => e.name === name);
-        if (!ev) {ev = {id: uid(), instId: institution.id, deptId: '', name, repeat: 'none', start: s.date}; events.push(ev);}
+        if (!ev) { ev = { id: uid(), instId: institution.id, deptId: '', name, repeat: 'none', start: s.date }; events.push(ev); }
         if (s.date < ev.start) ev.start = s.date;
         s.eventId = ev.id;
         delete s.name;
       });
-      return {institutions: [institution], people: people.map(p => ({...p, instId: institution.id})), events, sessions};
+      return { institutions: [institution], people: people.map(p => ({ ...p, instId: institution.id })), events, sessions };
     };
 
     const exportData = () => {
-      const blob = new Blob([JSON.stringify({app: 'members', version: 3, exportedAt: new Date().toISOString(), ...state})], {type: 'application/json'});
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `members-${today()}.json`;
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      const data = { app: 'members', version: 3, exportedAt: new Date().toISOString(), ...state };
+      saveBlob(new Blob([JSON.stringify(data)], { type: 'application/json' }), `members-${today()}.json`);
     };
 
     const importData = async file => {
@@ -877,13 +735,13 @@
         resetNav(null);
         commit();
         alert('Backup importado.');
-      } catch {alert('Arquivo inválido.');}
+      } catch { alert('Arquivo inválido.'); }
     };
 
     /* ========== Actions (click delegation) ========== */
     const resetNav = instId => {
-      Object.assign(ui, {instId, tab: 'people', q: '', dq: '', eventId: null, sessionId: null});
-      ui.an = {deptId: '', eventId: '', traitId: '', valueId: '', from: '', to: ''};
+      Object.assign(ui, { instId, tab: 'people', q: '', dq: '', eventId: null, sessionId: null });
+      ui.an = { deptId: '', eventId: '', traitId: '', valueId: '', from: '', to: '' };
     };
     const dropTraitFromPeople = (tid, vid) => state.people.forEach(p => {
       if (!vid || p.traits[tid] === vid) delete p.traits[tid];
@@ -894,16 +752,16 @@
     };
 
     const act = {
-      tab: el => {ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.eventId = null; ui.sessionId = null; render();},
+      tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.eventId = null; ui.sessionId = null; render(); },
       closeDlg: () => $('#dlg').close(),
 
-      home: () => {resetNav(null); render();},
-      addInst: () => {const n = ask('Nome da instituição:'); if (n) {state.institutions.push({id: uid(), name: n, traits: [], depts: []}); commit();} },
-      openInst: el => {resetNav(el.dataset.id); render();},
+      home: () => { resetNav(null); render(); },
+      addInst: () => { const n = ask('Nome da instituição:'); if (n) { state.institutions.push({ id: uid(), name: n, traits: [], depts: [] }); commit(); } },
+      openInst: el => { resetNav(el.dataset.id); render(); },
       renInst: el => {
         const i = state.institutions.find(x => x.id === el.dataset.id);
         const n = ask('Novo nome:', i.name);
-        if (n) {i.name = n; commit();}
+        if (n) { i.name = n; commit(); }
       },
       delInst: el => {
         const id = el.dataset.id, i = state.institutions.find(x => x.id === id);
@@ -920,14 +778,14 @@
         if (!confirm('Excluir esta pessoa?')) return;
         const id = el.dataset.id;
         state.people = state.people.filter(p => p.id !== id);
-        state.sessions.forEach(s => {s.present = s.present.filter(x => x !== id);});
+        state.sessions.forEach(s => { s.present = s.present.filter(x => x !== id); });
         $('#dlg').close();
         commit();
       },
 
-      addTrait: () => {const n = ask('Nome do atributo (ex.: Cargo):'); if (n) {inst().traits.push({id: uid(), name: n, values: []}); commit();} },
-      renTrait: el => {const t = inst().traits[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) {t.name = n; commit();} },
-      moveTrait: el => {move(inst().traits, +el.dataset.i, +el.dataset.d); commit();},
+      addTrait: () => { const n = ask('Nome do atributo (ex.: Cargo):'); if (n) { inst().traits.push({ id: uid(), name: n, values: [] }); commit(); } },
+      renTrait: el => { const t = inst().traits[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) { t.name = n; commit(); } },
+      moveTrait: el => { move(inst().traits, +el.dataset.i, +el.dataset.d); commit(); },
       delTrait: el => {
         const t = inst().traits[el.dataset.i];
         if (!confirm(`Excluir "${t.name}" e seus valores?`)) return;
@@ -936,9 +794,9 @@
         commit();
       },
 
-      addValue: el => {const n = ask('Nome do valor (ex.: Pastor):'); if (n) {inst().traits[el.dataset.i].values.push({id: uid(), name: n}); commit();} },
-      renVal: el => {const v = inst().traits[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) {v.name = n; commit();} },
-      moveVal: el => {move(inst().traits[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit();},
+      addValue: el => { const n = ask('Nome do valor (ex.: Pastor):'); if (n) { inst().traits[el.dataset.i].values.push({ id: uid(), name: n }); commit(); } },
+      renVal: el => { const v = inst().traits[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) { v.name = n; commit(); } },
+      moveVal: el => { move(inst().traits[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit(); },
       delVal: el => {
         const t = inst().traits[el.dataset.i], v = t.values[el.dataset.j];
         if (!confirm(`Excluir "${v.name}"?`)) return;
@@ -947,26 +805,26 @@
         commit();
       },
 
-      addDept: () => {const n = ask('Nome do departamento (ex.: Varões):'); if (n) {inst().depts.push({id: uid(), name: n}); commit();} },
+      addDept: () => { const n = ask('Nome do departamento (ex.: Varões):'); if (n) { inst().depts.push({ id: uid(), name: n }); commit(); } },
       renDept: el => {
         const d = inst().depts.find(x => x.id === el.dataset.id);
         const n = ask('Novo nome:', d.name);
-        if (n) {d.name = n; commit();}
+        if (n) { d.name = n; commit(); }
       },
       delDept: el => {
         const id = el.dataset.id, d = inst().depts.find(x => x.id === id);
         if (!confirm(`Excluir "${d.name}" com seus eventos e chamadas? As pessoas continuam na instituição.`)) return;
         state.events.filter(e => e.deptId === id).forEach(e => removeEvent(e.id));
-        state.people.forEach(p => {p.depts = p.depts.filter(x => x !== id);});
+        state.people.forEach(p => { p.depts = p.depts.filter(x => x !== id); });
         inst().depts = inst().depts.filter(x => x.id !== id);
         commit();
       },
-      deptPeople: el => {ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; render();},
+      deptPeople: el => { ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; render(); },
 
       newEvent: () => eventDialog(''),
       editEvent: el => eventDialog(el.dataset.id),
-      openEvent: el => {ui.eventId = el.dataset.id; render();},
-      backEvents: () => {ui.eventId = null; render();},
+      openEvent: el => { ui.eventId = el.dataset.id; render(); },
+      backEvents: () => { ui.eventId = null; render(); },
       delEvent: el => {
         if (!confirm('Excluir este evento e todas as suas chamadas?')) return;
         removeEvent(el.dataset.id);
@@ -977,8 +835,8 @@
 
       pickDate: el => createSession(ui.eventId, el.dataset.date),
       otherDate: dateDialog,
-      openSession: el => {ui.sessionId = el.dataset.id; ui.q = ''; render();},
-      backEvent: () => {ui.sessionId = null; ui.q = ''; render();},
+      openSession: el => { ui.sessionId = el.dataset.id; ui.q = ''; render(); },
+      backEvent: () => { ui.sessionId = null; ui.q = ''; render(); },
       delSession: () => {
         if (!confirm('Excluir esta chamada?')) return;
         state.sessions = state.sessions.filter(s => s.id !== ui.sessionId);
@@ -992,6 +850,7 @@
         $('#cnt').textContent = `${s.present.length} / ${eventPeople(curEvent()).length}`;
         refreshList();
       },
+      pdf: sharePdf,
 
       export: exportData
     };
@@ -1004,7 +863,7 @@
     const FORMS = {
       personForm: savePerson,
       eventForm: saveEvent,
-      dateForm: f => {$('#dlg').close(); createSession(ui.eventId, f.get('date'));}
+      dateForm: f => { $('#dlg').close(); createSession(ui.eventId, f.get('date')); }
     };
     document.addEventListener('submit', e => {
       e.preventDefault();
@@ -1012,7 +871,7 @@
     });
 
     document.addEventListener('input', e => {
-      if (e.target.id === 'q') {ui.q = e.target.value; refreshList();}
+      if (e.target.id === 'q') { ui.q = e.target.value; refreshList(); }
     });
 
     document.addEventListener('change', async e => {
@@ -1040,7 +899,7 @@
       ['people', 'Pessoas', peopleView], ['traits', 'Atributos', traitsView], ['depts', 'Deptos', deptsView],
       ['att', 'Eventos', attView], ['stats', 'Análise', statsView]
     ];
-    const refreshList = () => {$('#list').innerHTML = ui.tab === 'people' ? peopleList() : rollList();};
+    const refreshList = () => { $('#list').innerHTML = ui.tab === 'people' ? peopleList() : rollList(); };
 
     function render() {
       if (ui.instId && !inst()) resetNav(null);

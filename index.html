@@ -69,6 +69,9 @@
     input[type=checkbox]{width:auto}
     label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--sub)}
     label.chkrow{flex-direction:row;align-items:center;gap:8px;font-size:16px;color:var(--tx)}
+    .dbox{display:flex;flex-direction:column;gap:8px}
+    .dsel{display:flex;flex-direction:column;gap:8px;padding-left:26px}
+    .dsel[hidden]{display:none}
     .card,.box{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:10px;display:flex;gap:10px;align-items:center}
     .box{flex-direction:column;align-items:stretch}
     .col{display:flex;flex-direction:column;gap:10px}
@@ -129,14 +132,17 @@
     })();
 
     /* ========== State ========== */
-    // institutions: [{id, name, traits:[{id, name, values:[{id, name}]}], depts:[{id, name}]}]
-    //               -> array order = rank for traits and values (index 0 is the highest)
-    // people:       [{id, instId, name, phone, birth, photo, traits:{traitId: valueId}, depts:[deptId]}]
-    // events:       [{id, instId, deptId, name, repeat, start}]   deptId '' = whole institution
+    // institutions: [{id, name, traits:[Trait], depts:[{id, name, traits:[Trait]}]}]
+    //               Trait = {id, name, values:[{id, name}]} -> array order = rank (index 0 is the highest)
+    // people:       [{id, instId, name, phone, birth, photo,
+    //                 traits:{traitId: valueId},                 institution traits
+    //                 depts:[deptId],                            departments the person belongs to
+    //                 dtraits:{deptId: {traitId: valueId}}}]     department traits (e.g. role)
+    // events:       [{id, instId, deptId, name, repeat, start}]  deptId '' = whole institution
     //               repeat: none | daily | weekly | biweekly | monthly
-    // sessions:     [{id, eventId, date, present:[personId]}]     one session = one roll call on one date
+    // sessions:     [{id, eventId, date, present:[personId]}]    one session = one roll call on one date
     let state = { institutions: [], people: [], events: [], sessions: [] };
-    const ui = { instId: null, tab: 'people', q: '', dq: '', eventId: null, sessionId: null, an: {} };
+    const ui = { instId: null, tab: 'people', q: '', dq: '', deptId: null, eventId: null, sessionId: null, an: {} };
     let photoTmp = '';
 
     const REPEAT = { none: 'Não repete', daily: 'Todo dia', weekly: 'Toda semana', biweekly: 'A cada 2 semanas', monthly: 'Todo mês' };
@@ -209,7 +215,10 @@
     const curEvent = () => state.events.find(e => e.id === ui.eventId);
     const curSession = () => state.sessions.find(s => s.id === ui.sessionId);
     const eventSessions = id => state.sessions.filter(s => s.eventId === id);
-    const deptName = id => inst().depts.find(d => d.id === id)?.name || '';
+    const deptOf = id => inst().depts.find(d => d.id === id);
+    const deptName = id => deptOf(id)?.name || '';
+    // Trait owner: the institution ('') or one of its departments
+    const ownerOf = id => (id ? deptOf(id) : inst());
 
     // Who is expected at an event: everybody, or only the members of its department
     const inEvent = (p, ev) => !ev.deptId || p.depts.includes(ev.deptId);
@@ -242,15 +251,31 @@
       commit();
     };
 
-    /* ========== Ranking ========== */
-    const valueIndex = (p, t) => {
-      const i = t.values.findIndex(v => v.id === p.traits[t.id]);
+    /* ========== Traits & ranking ========== */
+    // Trait values of a person: institution traits (deptId '') or the traits of one department
+    const traitBag = (p, deptId) => (deptId ? p.dtraits[deptId] || {} : p.traits);
+    const valueIndex = (bag, t) => {
+      const i = t.values.findIndex(v => v.id === bag[t.id]);
       return i < 0 ? 999 : i;
     };
-    // Sort by trait priority first, then by value rank, then by name
-    const sortPeople = list => [...list].sort((a, b) => {
+    // [{t, v}] for every trait the person has a value in
+    const traitParts = (p, traits, deptId) => traits
+      .map(t => ({ t, v: t.values.find(v => v.id === traitBag(p, deptId)[t.id]) }))
+      .filter(x => x.v);
+    // Department traits first (when in a department context), then institution traits
+    const allParts = (p, deptId) => [
+      ...(deptId ? traitParts(p, deptOf(deptId).traits, deptId) : []),
+      ...traitParts(p, inst().traits, '')
+    ];
+
+    // Sort by department traits (if a department is given), then institution traits, then name
+    const sortPeople = (list, deptId = '') => [...list].sort((a, b) => {
+      for (const t of deptId ? deptOf(deptId).traits : []) {
+        const d = valueIndex(traitBag(a, deptId), t) - valueIndex(traitBag(b, deptId), t);
+        if (d) return d;
+      }
       for (const t of inst().traits) {
-        const d = valueIndex(a, t) - valueIndex(b, t);
+        const d = valueIndex(a.traits, t) - valueIndex(b.traits, t);
         if (d) return d;
       }
       return a.name.localeCompare(b.name);
@@ -261,12 +286,13 @@
       ? `<img class="av" src="${p.photo}" alt="">`
       : `<div class="av ph">${esc((p.name[0] || '?').toUpperCase())}</div>`;
 
-    const badges = p => inst().traits.map(t => {
-      const v = t.values.find(v => v.id === p.traits[t.id]);
-      return v ? `<span class="tag">${esc(t.name)}: ${esc(v.name)}</span>` : '';
-    }).join('');
+    const badges = (p, deptId = '') => allParts(p, deptId).map(({ t, v }) => `<span class="tag">${esc(t.name)}: ${esc(v.name)}</span>`).join('');
 
-    const deptTags = p => p.depts.map(deptName).filter(Boolean).map(n => `<span class="tag dp">${esc(n)}</span>`).join('');
+    // One tag per department of the person, with its roles (e.g. "Varões · Líder")
+    const deptTags = p => p.depts.map(deptOf).filter(Boolean).map(d => {
+      const roles = traitParts(p, d.traits, d.id).map(x => x.v.name);
+      return `<span class="tag dp">${esc([d.name, ...roles].join(' · '))}</span>`;
+    }).join('');
 
     const matchQ = p => (!ui.dq || p.depts.includes(ui.dq)) && (!ui.q || (p.name + ' ' + p.phone).toLowerCase().includes(ui.q.toLowerCase()));
     const openDlg = html => { $('#dlg').innerHTML = html; $('#dlg').showModal(); };
@@ -276,6 +302,14 @@
         <span class="sp"></span><button class="primary">Salvar</button>
       </div>`;
     const selectOpt = (val, label, cur) => `<option value="${val}" ${val === cur ? 'selected' : ''}>${esc(label)}</option>`;
+    // One <select> per trait, named `${prefix}${traitId}`
+    const traitSelects = (traits, bag, prefix) => traits.map(t => `
+      <label>${esc(t.name)}
+        <select name="${prefix}${t.id}">
+          <option value="">—</option>
+          ${t.values.map(v => selectOpt(v.id, v.name, bag[t.id])).join('')}
+        </select>
+      </label>`).join('');
 
     /* ========== View: Institutions (home) ========== */
     const homeView = () => `
@@ -293,7 +327,7 @@
       ${backupView()}`;
 
     /* ========== View: People ========== */
-    const peopleList = () => sortPeople(instPeople()).filter(matchQ).map(p => `
+    const peopleList = () => sortPeople(instPeople(), ui.dq).filter(matchQ).map(p => `
       <div class="card" data-act="editPerson" data-id="${p.id}">
         ${avatar(p)}
         <div>
@@ -310,7 +344,7 @@
       <div id="list" class="col">${peopleList()}</div>`;
 
     const personDialog = id => {
-      const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: [] };
+      const p = state.people.find(x => x.id === id) || { id: '', name: '', phone: '', birth: '', photo: '', traits: {}, depts: [], dtraits: {} };
       photoTmp = p.photo;
       openDlg(`
       <form id="personForm" data-id="${p.id}">
@@ -321,65 +355,75 @@
         <label>Nome<input name="name" required value="${esc(p.name)}"></label>
         <label>Telefone<input name="phone" type="tel" value="${esc(p.phone)}"></label>
         <label>Data de nascimento<input name="birth" type="date" value="${esc(p.birth)}"></label>
-        ${inst().traits.map(t => `
-          <label>${esc(t.name)}
-            <select name="t_${t.id}">
-              <option value="">—</option>
-              ${t.values.map(v => `<option value="${v.id}" ${p.traits[t.id] === v.id ? 'selected' : ''}>${esc(v.name)}</option>`).join('')}
-            </select>
-          </label>`).join('')}
+        ${traitSelects(inst().traits, p.traits, 't_')}
         ${inst().depts.length ? `
           <div class="col">
             <span class="hint">Departamentos</span>
-            ${inst().depts.map(d => `<label class="chkrow"><input type="checkbox" name="d_${d.id}" ${p.depts.includes(d.id) ? 'checked' : ''}>${esc(d.name)}</label>`).join('')}
+            ${inst().depts.map(d => {
+              const on = p.depts.includes(d.id);
+              return `<div class="dbox">
+                <label class="chkrow"><input type="checkbox" name="d_${d.id}" data-dchk ${on ? 'checked' : ''}>${esc(d.name)}</label>
+                ${d.traits.length ? `<div class="dsel" ${on ? '' : 'hidden'}>${traitSelects(d.traits, p.dtraits[d.id] || {}, `dt_${d.id}_`)}</div>` : ''}
+              </div>`;
+            }).join('')}
           </div>` : ''}
         ${dlgButtons(p.id ? `<button type="button" class="danger" data-act="delPerson" data-id="${p.id}">Excluir</button>` : '')}
       </form>`);
     };
 
     const savePerson = (f, id) => {
+      const depts = inst().depts.filter(d => f.get('d_' + d.id));
       const data = {
         name: f.get('name').trim(), phone: f.get('phone').trim(), birth: f.get('birth'), photo: photoTmp,
-        traits: {},
-        depts: inst().depts.filter(d => f.get('d_' + d.id)).map(d => d.id)
+        traits: {}, depts: depts.map(d => d.id), dtraits: {}
       };
       inst().traits.forEach(t => { const v = f.get('t_' + t.id); if (v) data.traits[t.id] = v; });
+      // Department traits are kept only for departments the person belongs to
+      depts.forEach(d => {
+        data.dtraits[d.id] = {};
+        d.traits.forEach(t => { const v = f.get(`dt_${d.id}_${t.id}`); if (v) data.dtraits[d.id][t.id] = v; });
+      });
       if (id) Object.assign(state.people.find(p => p.id === id), data);
       else state.people.push({ id: uid(), instId: ui.instId, ...data });
       $('#dlg').close();
       commit();
     };
 
-    /* ========== View: Traits ========== */
-    const traitsView = () => `
-      <button class="primary" data-act="addTrait">+ Atributo</button>
-      <p class="hint">A ordem define a superioridade: o topo é o mais alto. Pessoas são ordenadas pelos atributos na ordem listada.</p>
-      ${inst().traits.map((t, ti) => `
+    /* ========== Traits editor (shared by institution and departments) ========== */
+    // oid: '' for institution traits, or the department id
+    const traitsEditor = (traits, oid) => `
+      <button class="primary" data-act="addTrait" data-o="${oid}">+ Atributo</button>
+      ${traits.map((t, ti) => `
       <section class="box">
         <div class="row">
           <b>${esc(t.name)}</b><span class="sp"></span>
-          <button data-act="moveTrait" data-i="${ti}" data-d="-1">↑</button>
-          <button data-act="moveTrait" data-i="${ti}" data-d="1">↓</button>
-          <button data-act="renTrait" data-i="${ti}">✎</button>
-          <button class="danger" data-act="delTrait" data-i="${ti}">🗑</button>
+          <button data-act="moveTrait" data-o="${oid}" data-i="${ti}" data-d="-1">↑</button>
+          <button data-act="moveTrait" data-o="${oid}" data-i="${ti}" data-d="1">↓</button>
+          <button data-act="renTrait" data-o="${oid}" data-i="${ti}">✎</button>
+          <button class="danger" data-act="delTrait" data-o="${oid}" data-i="${ti}">🗑</button>
         </div>
         ${t.values.map((v, vi) => `
         <div class="row">
           <span>${vi + 1}. ${esc(v.name)}</span><span class="sp"></span>
-          <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="-1">↑</button>
-          <button data-act="moveVal" data-i="${ti}" data-j="${vi}" data-d="1">↓</button>
-          <button data-act="renVal" data-i="${ti}" data-j="${vi}">✎</button>
-          <button class="danger" data-act="delVal" data-i="${ti}" data-j="${vi}">🗑</button>
+          <button data-act="moveVal" data-o="${oid}" data-i="${ti}" data-j="${vi}" data-d="-1">↑</button>
+          <button data-act="moveVal" data-o="${oid}" data-i="${ti}" data-j="${vi}" data-d="1">↓</button>
+          <button data-act="renVal" data-o="${oid}" data-i="${ti}" data-j="${vi}">✎</button>
+          <button class="danger" data-act="delVal" data-o="${oid}" data-i="${ti}" data-j="${vi}">🗑</button>
         </div>`).join('')}
-        <button data-act="addValue" data-i="${ti}">+ Valor</button>
+        <button data-act="addValue" data-o="${oid}" data-i="${ti}">+ Valor</button>
       </section>`).join('')}`;
 
+    /* ========== View: Traits ========== */
+    const traitsView = () => `
+      <p class="hint">A ordem define a superioridade: o topo é o mais alto. Pessoas são ordenadas pelos atributos na ordem listada.</p>
+      ${traitsEditor(inst().traits, '')}`;
+
     /* ========== View: Departments ========== */
-    const deptsView = () => `
+    const deptsView = () => ui.deptId ? deptView() : `
       <button class="primary" data-act="addDept">+ Departamento</button>
-      <p class="hint">Toque em um departamento para ver seus membros. Atribua pessoas a ele no cadastro delas.</p>
+      <p class="hint">Toque em um departamento para ver os membros e criar atributos dele (ex.: Função).</p>
       ${inst().depts.map(d => `
-      <div class="card" data-act="deptPeople" data-id="${d.id}">
+      <div class="card" data-act="openDept" data-id="${d.id}">
         <div>
           <b>${esc(d.name)}</b>
           <div class="sub">${instPeople().filter(p => p.depts.includes(d.id)).length} membros · ${instEvents().filter(e => e.deptId === d.id).length} eventos</div>
@@ -388,6 +432,18 @@
         <button data-act="renDept" data-id="${d.id}">✎</button>
         <button class="danger" data-act="delDept" data-id="${d.id}">🗑</button>
       </div>`).join('') || '<p class="empty">Nenhum departamento.</p>'}`;
+
+    const deptView = () => {
+      const d = deptOf(ui.deptId);
+      return `
+      <div class="row">
+        <button data-act="backDepts">←</button>
+        <b>${esc(d.name)}</b><span class="sp"></span>
+        <button data-act="deptPeople" data-id="${d.id}">Membros (${instPeople().filter(p => p.depts.includes(d.id)).length})</button>
+      </div>
+      <p class="hint">Atributos deste departamento (ex.: Função: Líder, Vice-líder, Tesoureiro). A ordem define a prioridade.</p>
+      ${traitsEditor(d.traits, d.id)}`;
+    };
 
     /* ========== View: Events ========== */
     const lastDate = ev => eventSessions(ev.id).map(s => s.date).sort().pop() || '';
@@ -469,14 +525,16 @@
       </form>`);
 
     /* ========== View: Roll call ========== */
+    // Present people first, each group in rank order
     const rollList = () => {
-      const s = curSession();
-      return sortPeople(eventPeople(curEvent())).filter(matchQ).map(p => {
-        const on = s.present.includes(p.id);
-        return `<div class="card ${on ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
-          ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p)}</div></div>
-          <span class="sp"></span><span class="chk">${on ? '✔' : ''}</span></div>`;
-      }).join('') || '<p class="empty">Nenhuma pessoa.</p>';
+      const s = curSession(), ev = curEvent();
+      const isOn = p => s.present.includes(p.id);
+      return sortPeople(eventPeople(ev), ev.deptId).filter(matchQ)
+        .sort((a, b) => isOn(b) - isOn(a))
+        .map(p => `<div class="card ${isOn(p) ? 'on' : ''}" data-act="toggle" data-id="${p.id}">
+          ${avatar(p)}<div><b>${esc(p.name)}</b><div>${badges(p, ev.deptId)}</div></div>
+          <span class="sp"></span><span class="chk">${isOn(p) ? '✔' : ''}</span></div>`)
+        .join('') || '<p class="empty">Nenhuma pessoa.</p>';
     };
 
     const rollCall = () => {
@@ -496,13 +554,11 @@
     const attView = () => ui.sessionId ? rollCall() : ui.eventId ? eventView() : eventsView();
 
     /* ========== PDF: attendance report ========== */
-    // Plain-text version of a person's traits (e.g. "Cargo: Pastor · Ministério: Louvor")
-    const traitsText = p => inst().traits
-      .map(t => { const v = t.values.find(v => v.id === p.traits[t.id]); return v ? `${t.name}: ${v.name}` : ''; })
-      .filter(Boolean).join(' · ');
+    // Plain-text version of a person's traits (e.g. "Função: Líder · Cargo: Pastor")
+    const traitsText = (p, deptId) => allParts(p, deptId).map(({ t, v }) => `${t.name}: ${v.name}`).join(' · ');
 
     // Draws the report on A4 canvases (1240x1754 = 150 dpi); a new page starts when one fills up
-    const drawPdfPages = ({ title, subtitle, summary, sections }) => {
+    const drawPdfPages = ({ title, subtitle, summary, sections, deptId }) => {
       const W = 1240, H = 1754, M = 90, ROW = 46;
       const FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
       const pages = [];
@@ -543,7 +599,7 @@
         list.forEach((p, i) => {
           need(ROW);
           text(`${i + 1}. ${p.name}`, M, 28, { maxW: 520 });
-          text(traitsText(p), M + 560, 22, { color: '#6b7280', maxW: W - M - (M + 560) });
+          text(traitsText(p, deptId), M + 560, 22, { color: '#6b7280', maxW: W - M - (M + 560) });
           g.fillStyle = '#e5e7eb';
           g.fillRect(M, y + ROW - 8, W - 2 * M, 2);
           y += ROW;
@@ -592,7 +648,7 @@
     // Builds the PDF of the open roll call and shares it (native share sheet, or download as fallback)
     const sharePdf = async () => {
       const s = curSession(), ev = curEvent();
-      const people = sortPeople(eventPeople(ev));
+      const people = sortPeople(eventPeople(ev), ev.deptId);
       const present = people.filter(p => s.present.includes(p.id));
       const absent = people.filter(p => !s.present.includes(p.id));
       const pct = people.length ? Math.round(present.length / people.length * 100) : 0;
@@ -602,7 +658,8 @@
         title,
         subtitle: [inst().name, ev.deptId && deptName(ev.deptId)].filter(Boolean).join(' · '),
         summary: `Presentes: ${present.length} de ${people.length} (${pct}%)`,
-        sections: [{ label: 'Presentes', list: present }, { label: 'Ausentes', list: absent }]
+        sections: [{ label: 'Presentes', list: present }, { label: 'Ausentes', list: absent }],
+        deptId: ev.deptId
       });
       const name = `${slug(ev.name)}-${s.date}.pdf`;
       const blob = makePdf(pages);
@@ -692,15 +749,19 @@
       </section>`;
 
     // Converts any saved/backup format into the current one
-    // v1: no institutions or events | v2: no departments | v3: current
+    // v1: no institutions or events | v2: no departments | v3: no department traits | v4: current
     const migrate = d => {
-      const people = (d.people || []).map(p => ({ ...p, traits: p.traits || {}, depts: p.depts || [] }));
+      const people = (d.people || []).map(p => ({ ...p, traits: p.traits || {}, depts: p.depts || [], dtraits: p.dtraits || {} }));
       const sessions = (d.sessions || []).map(s => ({ ...s, present: s.present || [] }));
       const fixTraits = list => (list || []).map(t => ({ ...t, values: t.values || [] }));
 
       if (Array.isArray(d.institutions)) {
         return {
-          institutions: d.institutions.map(i => ({ ...i, traits: fixTraits(i.traits), depts: i.depts || [] })),
+          institutions: d.institutions.map(i => ({
+            ...i,
+            traits: fixTraits(i.traits),
+            depts: (i.depts || []).map(dp => ({ ...dp, traits: fixTraits(dp.traits) }))
+          })),
           people,
           events: (d.events || []).map(e => ({ ...e, deptId: e.deptId || '' })),
           sessions
@@ -722,7 +783,7 @@
     };
 
     const exportData = () => {
-      const data = { app: 'members', version: 3, exportedAt: new Date().toISOString(), ...state };
+      const data = { app: 'members', version: 4, exportedAt: new Date().toISOString(), ...state };
       saveBlob(new Blob([JSON.stringify(data)], { type: 'application/json' }), `members-${today()}.json`);
     };
 
@@ -740,19 +801,23 @@
 
     /* ========== Actions (click delegation) ========== */
     const resetNav = instId => {
-      Object.assign(ui, { instId, tab: 'people', q: '', dq: '', eventId: null, sessionId: null });
+      Object.assign(ui, { instId, tab: 'people', q: '', dq: '', deptId: null, eventId: null, sessionId: null });
       ui.an = { deptId: '', eventId: '', traitId: '', valueId: '', from: '', to: '' };
     };
-    const dropTraitFromPeople = (tid, vid) => state.people.forEach(p => {
-      if (!vid || p.traits[tid] === vid) delete p.traits[tid];
+    // Removes a trait (or just one of its values) from every person; oid '' = institution trait, else department id
+    const dropTrait = (oid, tid, vid) => state.people.forEach(p => {
+      const bag = oid ? p.dtraits[oid] : p.traits;
+      if (bag && (!vid || bag[tid] === vid)) delete bag[tid];
     });
     const removeEvent = id => {
       state.sessions = state.sessions.filter(s => s.eventId !== id);
       state.events = state.events.filter(e => e.id !== id);
     };
+    // Traits array a button's data-o points to
+    const traitsOf = el => ownerOf(el.dataset.o).traits;
 
     const act = {
-      tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.eventId = null; ui.sessionId = null; render(); },
+      tab: el => { ui.tab = el.dataset.k; ui.q = ''; ui.dq = ''; ui.deptId = null; ui.eventId = null; ui.sessionId = null; render(); },
       closeDlg: () => $('#dlg').close(),
 
       home: () => { resetNav(null); render(); },
@@ -783,43 +848,46 @@
         commit();
       },
 
-      addTrait: () => { const n = ask('Nome do atributo (ex.: Cargo):'); if (n) { inst().traits.push({ id: uid(), name: n, values: [] }); commit(); } },
-      renTrait: el => { const t = inst().traits[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) { t.name = n; commit(); } },
-      moveTrait: el => { move(inst().traits, +el.dataset.i, +el.dataset.d); commit(); },
+      // Traits and values: institution (data-o="") or department (data-o=deptId)
+      addTrait: el => { const n = ask('Nome do atributo (ex.: Cargo):'); if (n) { traitsOf(el).push({ id: uid(), name: n, values: [] }); commit(); } },
+      renTrait: el => { const t = traitsOf(el)[el.dataset.i]; const n = ask('Novo nome:', t.name); if (n) { t.name = n; commit(); } },
+      moveTrait: el => { move(traitsOf(el), +el.dataset.i, +el.dataset.d); commit(); },
       delTrait: el => {
-        const t = inst().traits[el.dataset.i];
+        const t = traitsOf(el)[el.dataset.i];
         if (!confirm(`Excluir "${t.name}" e seus valores?`)) return;
-        dropTraitFromPeople(t.id);
-        inst().traits.splice(el.dataset.i, 1);
+        dropTrait(el.dataset.o, t.id);
+        traitsOf(el).splice(el.dataset.i, 1);
         commit();
       },
 
-      addValue: el => { const n = ask('Nome do valor (ex.: Pastor):'); if (n) { inst().traits[el.dataset.i].values.push({ id: uid(), name: n }); commit(); } },
-      renVal: el => { const v = inst().traits[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) { v.name = n; commit(); } },
-      moveVal: el => { move(inst().traits[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit(); },
+      addValue: el => { const n = ask('Nome do valor (ex.: Pastor):'); if (n) { traitsOf(el)[el.dataset.i].values.push({ id: uid(), name: n }); commit(); } },
+      renVal: el => { const v = traitsOf(el)[el.dataset.i].values[el.dataset.j]; const n = ask('Novo nome:', v.name); if (n) { v.name = n; commit(); } },
+      moveVal: el => { move(traitsOf(el)[el.dataset.i].values, +el.dataset.j, +el.dataset.d); commit(); },
       delVal: el => {
-        const t = inst().traits[el.dataset.i], v = t.values[el.dataset.j];
+        const t = traitsOf(el)[el.dataset.i], v = t.values[el.dataset.j];
         if (!confirm(`Excluir "${v.name}"?`)) return;
-        dropTraitFromPeople(t.id, v.id);
+        dropTrait(el.dataset.o, t.id, v.id);
         t.values.splice(el.dataset.j, 1);
         commit();
       },
 
-      addDept: () => { const n = ask('Nome do departamento (ex.: Varões):'); if (n) { inst().depts.push({ id: uid(), name: n }); commit(); } },
+      addDept: () => { const n = ask('Nome do departamento (ex.: Varões):'); if (n) { inst().depts.push({ id: uid(), name: n, traits: [] }); commit(); } },
       renDept: el => {
-        const d = inst().depts.find(x => x.id === el.dataset.id);
+        const d = deptOf(el.dataset.id);
         const n = ask('Novo nome:', d.name);
         if (n) { d.name = n; commit(); }
       },
       delDept: el => {
-        const id = el.dataset.id, d = inst().depts.find(x => x.id === id);
-        if (!confirm(`Excluir "${d.name}" com seus eventos e chamadas? As pessoas continuam na instituição.`)) return;
+        const id = el.dataset.id, d = deptOf(id);
+        if (!confirm(`Excluir "${d.name}" com seus eventos, chamadas e atributos? As pessoas continuam na instituição.`)) return;
         state.events.filter(e => e.deptId === id).forEach(e => removeEvent(e.id));
-        state.people.forEach(p => { p.depts = p.depts.filter(x => x !== id); });
+        state.people.forEach(p => { p.depts = p.depts.filter(x => x !== id); delete p.dtraits[id]; });
         inst().depts = inst().depts.filter(x => x.id !== id);
         commit();
       },
-      deptPeople: el => { ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; render(); },
+      openDept: el => { ui.deptId = el.dataset.id; render(); },
+      backDepts: () => { ui.deptId = null; render(); },
+      deptPeople: el => { ui.tab = 'people'; ui.q = ''; ui.dq = el.dataset.id; ui.deptId = null; render(); },
 
       newEvent: () => eventDialog(''),
       editEvent: el => eventDialog(el.dataset.id),
@@ -880,6 +948,9 @@
         photoTmp = await readPhoto(t.files[0]);
         $('#pv').src = photoTmp;
         $('#pv').hidden = false;
+      } else if ('dchk' in t.dataset) {
+        // Show the department's trait selects only while the department is checked
+        t.closest('.dbox').querySelector('.dsel')?.toggleAttribute('hidden', !t.checked);
       } else if (t.id === 'deptF') {
         ui.dq = t.value;
         refreshList();
@@ -903,6 +974,7 @@
 
     function render() {
       if (ui.instId && !inst()) resetNav(null);
+      if (ui.deptId && !deptOf(ui.deptId)) ui.deptId = null;
       const [, label, view] = ui.instId ? TABS.find(t => t[0] === ui.tab) : [0, 'MEMBERS', homeView];
 
       $('#head').innerHTML = `${ui.instId ? '<button data-act="home">←</button>' : ''}<h1>${esc(ui.instId ? `${inst().name} · ${label}` : label)}</h1>`;
@@ -916,7 +988,7 @@
       resetNav(null);
       const saved = await DB.get('state');
       if (saved) {
-        const outdated = !saved.institutions || saved.institutions.some(i => !i.depts);
+        const outdated = !saved.institutions || saved.institutions.some(i => !i.depts || i.depts.some(d => !d.traits));
         state = migrate(saved);
         if (outdated) save();
       }

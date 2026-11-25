@@ -1,5 +1,5 @@
 // Cache-first service worker; bump VERSION to force an update
-const VERSION = 'members-v4';
+const VERSION = 'members-v5';
 const CORE = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png', 'apple-icon.png'];
 
 self.addEventListener('install', e => {
